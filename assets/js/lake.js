@@ -94,18 +94,39 @@
       ln.el.setAttribute("points",pts(a));
     });
     V.spans.forEach(function(sp){
-      var len=sp.b-sp.a, n=Math.max(1,Math.ceil(len/6));
-      a=[]; for(i=0;i<=n;i++){ x=sp.a+len*i/n;
-        a.push(x, sp.y+0.75*Math.sin(Math.PI*i/n)*(0.6*swell(x,sp.y)+height(x,sp.y))); }   // moored at both ends
+      a=[];
+      sp.legs.forEach(function(lg){                 // each straight run floats, moored at both ends
+        var len=lg.b-lg.a, n=Math.max(1,Math.ceil(len/6));
+        for(i=0;i<=n;i++){ x=lg.a+len*i/n;
+          a.push(x, lg.y+0.75*Math.sin(Math.PI*i/n)*(0.6*swell(x,lg.y)+height(x,lg.y))); }
+      });
       sp.el.setAttribute("points",pts(a));
     });
+  }
+  function spanLen(sp){var L=0; sp.legs.forEach(function(lg,k){L+=lg.b-lg.a; if(k) L+=Math.abs(lg.y-sp.legs[k-1].y);}); return L;}
+
+  // On the About page the walkway reaches for the news: when the "Recently" landing is level with the
+  // water, the last stretch of the walkway bends to meet it, and follows it while you scroll.
+  var tRaf=0;
+  function requestTether(){ if(!tRaf) tRaf=requestAnimationFrame(function(){tRaf=0; tether(true);}); }
+  function tether(redraw){
+    var T=V&&V.tether; if(!T) return;
+    var entry=T.yIn+shore.getBoundingClientRect().top-lake.getBoundingClientRect().top;
+    var near=entry>=T.lo&&entry<=T.hi, goal=near?entry:T.y0;
+    if(T.locked&&near) T.cur=goal;
+    else { T.cur+=(goal-T.cur)*0.22; if(Math.abs(goal-T.cur)<0.6){T.cur=goal; T.locked=near;} else requestTether(); }
+    if(!near) T.locked=false;
+    var y=Math.round(T.cur);
+    T.sp.legs=Math.abs(y-T.y0)<1?[{a:T.a,b:V.LW,y:T.y0}]:[{a:T.a,b:T.xb,y:T.y0},{a:T.xb,b:V.LW,y:y}];
+    if(redraw) draw();
   }
 
   /* ---------- the walkway on the page ---------- */
   function plen(p){var L=0;for(var i=1;i<p.length;i++)L+=Math.abs(p[i][0]-p[i-1][0])+Math.abs(p[i][1]-p[i-1][1]);return L;}
-  function lay(el,len,delay){       // draw a line in, once, the first time the walkway is laid out
-    el.style.strokeDasharray=len+20; el.style.strokeDashoffset=len+20;
-    el.style.transition="stroke-dashoffset "+Math.round(len/1.1)+"ms linear "+Math.round(delay)+"ms";
+  function lay(el,delay){           // draw a line in, once, the first time the walkway is laid out
+    var BIG=10000;                   // longer than any walkway, so later bends never fall into the gap
+    el.style.strokeDasharray=BIG+" "+BIG; el.style.strokeDashoffset=BIG;
+    el.style.transition="stroke-dashoffset "+Math.round(BIG/1.1)+"ms linear "+Math.round(delay)+"ms";
   }
 
   function layout(){
@@ -126,7 +147,7 @@
     }
     function railFrom(y){return [[-4,y],[railX,y],[railX,bot]];}
 
-    var spans=[], shoreSegs=[], top=0, bottom=0, isle=null;
+    var spans=[], shoreSegs=[], top=0, bottom=0, isle=null, tether_=null;
     if(wide){
       var lk=rel(links,lake), mw=me.offsetWidth, ring=12;
       me.style.left=Math.round(Math.max(ring+16,LW*.22))+"px";
@@ -140,8 +161,13 @@
       me.style.top=Math.round(c-mw/2)+"px";
       var m=rel(me,lake), y0=Math.round(m.cy);
       isle={x:m.cx,y:m.cy,r:m.w/2+ring};
-      spans=[{a:0,b:m.l+2,y:y0},{a:m.r-2,b:LW,y:y0}];
-      if(hasRail){
+      spans=[{legs:[{a:0,b:m.l+2,y:y0}]},{legs:[{a:m.r-2,b:LW,y:y0}]}];
+      if(home&&hasRail){
+        shoreSegs=[railFrom(yIn)];
+        var tt={sp:spans[1],a:m.r-2,xb:Math.round(LW-30),y0:y0,lo:top+10,hi:bottom-10,yIn:yIn};
+        var e0=yIn+shore.getBoundingClientRect().top-lake.getBoundingClientRect().top;
+        tt.locked=e0>=tt.lo&&e0<=tt.hi; tt.cur=tt.locked?e0:y0; tether_=tt;
+      } else if(hasRail){
         if(aligned) shoreSegs=[railFrom(yIn)];
         else if(y0>=yIn&&y0<=Math.max(bot,stop)) shoreSegs=[[[-4,y0],[railX,y0]],[[railX,yIn],[railX,Math.max(bot,y0)]]];
         else shoreSegs=[railFrom(yIn)];
@@ -152,14 +178,14 @@
         var m2=rel(me,lake);
         top=Math.round(rel(who,lake).b+18); bottom=Math.round(rel(links,lake).t-14);
         isle={x:m2.cx,y:m2.cy,r:m2.w/2+10};
-        spans=[{a:0,b:m2.l+2,y:Math.round(m2.cy)}];
+        spans=[{legs:[{a:0,b:m2.l+2,y:Math.round(m2.cy)}]}];
       }
       if(hasRail) shoreSegs=[railFrom(yIn)];
       else if(a) shoreSegs=[[[-4,Math.round(a.b+9)],[Math.round(a.l+56),Math.round(a.b+9)]]];
     }
 
     // the surface: lines closer together towards the far shore, and calmer there
-    water.innerHTML=""; V={LW:LW,lines:[],spans:[]}; W=null;
+    water.innerHTML=""; V={LW:LW,lines:[],spans:[],tether:tether_}; W=null;
     if(bottom-top>60){
       var n=clamp(Math.round((bottom-top)/30),5,13), g=node("g","lines");
       water.appendChild(g);
@@ -172,7 +198,7 @@
       makeWater(LW,top-24,bottom+24,isle);
     }
     spans.forEach(function(sp){var pl=node("polyline","pier"); pl.setAttribute("stroke-width",sw); water.appendChild(pl); sp.el=pl; V.spans.push(sp);});
-    draw();
+    tether(false); draw();
 
     ws.innerHTML="";
     var shoreEls=shoreSegs.map(function(s){var p=node("polyline"); p.setAttribute("points",s.map(function(q){return q[0]+","+q[1];}).join(" "));
@@ -180,14 +206,14 @@
 
     if(drawIn){
       var t=350;
-      V.spans.forEach(function(sp){var len=sp.b-sp.a; lay(sp.el,len,t); sp.at=t; t+=len/1.1;});
-      shoreEls.forEach(function(p,k){var len=plen(shoreSegs[k]); lay(p,len,t); t+=len/1.1;});
+      V.spans.forEach(function(sp){lay(sp.el,t); sp.at=t; t+=spanLen(sp)/1.1;});
+      shoreEls.forEach(function(p,k){lay(p,t); t+=plen(shoreSegs[k])/1.1;});
       water.getBoundingClientRect(); ws.getBoundingClientRect();
       V.spans.concat(shoreEls.map(function(e){return {el:e};})).forEach(function(s){s.el.style.strokeDashoffset=0;});
       // laying the walkway on the water sets it rocking, once
       if(isle&&V.spans.length) setTimeout(function(){
         poke(isle.x-isle.r-10,isle.y,14); poke(isle.x+isle.r+10,isle.y,14);
-      }, V.spans[0].at+(V.spans[0].b-V.spans[0].a)/1.1);
+      }, V.spans[0].at+spanLen(V.spans[0])/1.1);
       visit.set("walked",1); drawIn=false;
     }
     lake.classList.add("ready");
@@ -215,6 +241,7 @@
   function start(){
     layout();
     window.addEventListener("resize",schedule);
+    window.addEventListener("scroll",function(){ if(V&&V.tether) requestTether(); },{passive:true});
     if("ResizeObserver" in window) new ResizeObserver(schedule).observe(document.body);
     [].forEach.call(document.querySelectorAll("details"),function(d){d.addEventListener("toggle",now);});
   }

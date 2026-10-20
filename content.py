@@ -10,7 +10,7 @@ Authors: write full names; add a trailing * for equal contribution.
 SITE = {
     "name": "Christian Internò",
     "url": "https://christianinterno.com",
-    "title": "PhD candidate, Bielefeld University",
+    "title": "Researcher, Bielefeld University",
     "interests": "World models, physical reasoning and distributed learning.",
     "tagline": "I study how neural networks model the physical world, and how they learn together.",
     "email": "christian.interno@uni-bielefeld.de",
@@ -29,14 +29,22 @@ SITE = {
 }
 
 BIO = [
-    'I’m a PhD candidate at Bielefeld University with <a href="https://hammer-lab.techfak.uni-bielefeld.de/">Barbara Hammer</a>, '
-    'working with the <a href="https://www.honda-ri.de/">Honda Research Institute Europe</a>, and a Visiting Fellow in Philip Torr’s '
-    '<a href="https://torrvision.com/">Torr Vision Group</a> at the University of Oxford. Most of my work is on world models and '
-    'physical reasoning: I read the geometry of learned representations to find out what networks know about physics, and use it '
-    'to tell whether a generated video could really happen. I also work on distributed learning, where many models learn together '
-    'without sharing their data.',
-    'Before that I was a visiting researcher at <a href="https://www.cshl.edu/">Cold Spring Harbor Laboratory</a> and Leiden University, '
-    'and I studied data science at the University of Milano-Bicocca. Off the clock, you’ll find me surfing, at the cinema or at a concert.',
+    'I am a researcher at Bielefeld University, working with <a href="https://hammer-lab.techfak.uni-bielefeld.de/">Barbara Hammer</a>; '
+    'my PhD is funded by the <a href="https://www.honda-ri.de/">Honda Research Institute Europe</a>. After a Visiting Fellowship in '
+    'Philip Torr’s <a href="https://torrvision.com/">Torr Vision Group</a> at the <a href="https://www.ox.ac.uk/">University of Oxford</a>, '
+    'I continue to work with the group on world models for video. Recently, <a href="/GeoPhys/">GeoPhys</a> took first place on both '
+    '<a href="https://github.com/google-deepmind/physics-IQ-benchmark">Physics&#8209;IQ</a> video-to-video leaderboards, and two of my '
+    'papers were accepted at NeurIPS 2026. I review for NeurIPS, ICML and IJCNN, and have '
+    '<a href="/mentoring/">mentored master’s students</a> at the Honda Research Institute.',
+    'My <a href="/research/">research</a> focuses on world models and physical reasoning: I read the geometry of learned '
+    'representations to find out what neural networks know about physics, and use it to tell whether a generated video could '
+    'really happen. Broadly, I want physical plausibility to become something we can measure: principled ways to read physics '
+    'out of a model without changing it, and to put that structure to work as a prior for learning, a verifier at inference time '
+    'and a diagnostic for anomalies.',
+    'Alongside this, I work on distributed learning, where many models learn together without sharing their data; that line '
+    'includes an oral at the NeurIPS 2024 workshop on federated foundation models. I have been a visiting researcher at '
+    '<a href="https://www.cshl.edu/">Cold Spring Harbor Laboratory</a> and Leiden University, and I studied data science at the '
+    'University of Milano-Bicocca. Off the clock, you’ll find me surfing, at the cinema or at a concert.',
 ]
 
 # Newest first. The first `NEWS_SHOWN` items are visible; the rest fold under "Earlier news".

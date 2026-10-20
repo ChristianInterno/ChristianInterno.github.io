@@ -512,7 +512,7 @@ def not_found():
 def person_ld():
     data = {
         "@context": "https://schema.org", "@type": "Person", "name": ME, "url": URL + "/",
-        "image": URL + "/assets/img/me.jpg", "jobTitle": "PhD candidate in machine learning",
+        "image": URL + "/assets/img/me.jpg", "jobTitle": "Machine learning researcher",
         "email": "mailto:" + C.SITE["email"],
         "knowsAbout": ["Representation learning", "World models", "Physical reasoning", "Distributed learning"],
         "affiliation": [
