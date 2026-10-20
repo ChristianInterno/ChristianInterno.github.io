@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Christian Internò</title>
+  <link href="https://christianinterno.com/blog/"/>
+  <link rel="self" href="https://christianinterno.com/blog/feed.xml"/>
+  <id>https://christianinterno.com/blog/</id>
+  <updated>2026-10-20T00:00:00Z</updated>
+  <author><name>Christian Internò</name></author>
+  <entry>
+    <title>The lake on this page</title>
+    <link href="https://christianinterno.com/blog/the-lake/"/>
+    <id>https://christianinterno.com/blog/the-lake/</id>
+    <updated>2026-10-20T00:00:00Z</updated>
+    <summary>Why there is a walkway on Lake Iseo next to my name, and the physics that moves the water around it.</summary>
+    <content type="html">&lt;p&gt;I grew up on Lake Iseo. For sixteen days in the summer of 2016, from 18 June to 3 July, Christo and Jeanne-Claude’s &lt;i&gt;The Floating Piers&lt;/i&gt; joined Sulzano to Monte Isola and the small island of San Paolo: about three kilometres of walkway, 226,000 floating cubes and 70,000 square metres of yellow fabric. More than a million people walked across the lake. The orange line on this site is that walkway.&lt;/p&gt;
+&lt;p&gt;The water next to it is not a looping animation. It is a small simulation, and since physical plausibility is what I work on, it seemed only fair that the drawing should get its physics right.&lt;/p&gt;
+&lt;h2&gt;Waves on deep water&lt;/h2&gt;
+&lt;p&gt;For small waves on deep water, a wave of wavenumber &lt;i&gt;k&lt;/i&gt; = 2π/&lt;i&gt;λ&lt;/i&gt; oscillates at a frequency fixed by the dispersion relation&lt;/p&gt;
+&lt;p class=&quot;eq&quot;&gt;&lt;i&gt;ω&lt;/i&gt;² = &lt;i&gt;gk&lt;/i&gt; + (&lt;i&gt;σ&lt;/i&gt;/&lt;i&gt;ρ&lt;/i&gt;) &lt;i&gt;k&lt;/i&gt;³&lt;/p&gt;
+&lt;p&gt;The first term is gravity pulling the crests down; the second is surface tension &lt;i&gt;σ&lt;/i&gt; (over the density &lt;i&gt;ρ&lt;/i&gt;) pulling the surface flat. Long waves are ruled by gravity and short ripples by surface tension, and the two disagree about speed. Among long waves the longest travel fastest; among ripples the shortest do. In between lies a slowest wave: on real water it is about 1.7 cm long and moves at about 23 cm/s.&lt;/p&gt;
+&lt;p&gt;On this page the constants are scaled so that the slowest wave is about a hundred pixels long. That puts both kinds of wave on the screen at once: the long waves from the breeze roll in slowly, and when you touch the water, the short ripples run out ahead of everything else.&lt;/p&gt;
+&lt;p&gt;Waves also fade, the short ones much faster than the long ones. Viscosity &lt;i&gt;ν&lt;/i&gt; takes their energy at a rate that grows with the square of the wavenumber, &lt;i&gt;γ&lt;/i&gt; = &lt;i&gt;γ&lt;/i&gt;₀ + 2&lt;i&gt;νk&lt;/i&gt;², so a ripple lives for a moment and a swell for much longer.&lt;/p&gt;
+&lt;h2&gt;Solving it exactly&lt;/h2&gt;
+&lt;p&gt;The breeze is seven wave trains, each with its own length and heading, each moving at the speed the dispersion relation gives it.&lt;/p&gt;
+&lt;p&gt;The ripples are where the equations earn their keep. Because the theory is linear, the surface can be written as a sum of Fourier modes on a periodic grid of 256 × 64, and each mode is then a little oscillator of its own. Its step forward in time can be written down exactly: a rotation by &lt;i&gt;ω&lt;/i&gt;(&lt;i&gt;k&lt;/i&gt;)Δ&lt;i&gt;t&lt;/i&gt; in its own phase space, and a shrink by e&lt;sup&gt;−&lt;i&gt;γ&lt;/i&gt;(&lt;i&gt;k&lt;/i&gt;)Δ&lt;i&gt;t&lt;/i&gt;&lt;/sup&gt;. No error builds up and nothing blows up, however long the page stays open. A touch adds a small Gaussian dent to the surface, which in Fourier space is a Gaussian too, so it goes into every mode at once. One inverse FFT per frame turns the spectrum back into heights, and the pencil lines follow them.&lt;/p&gt;
+&lt;p&gt;Move the pointer across the water to leave a wake, or tap it to drop a stone. If your system asks for reduced motion, the lake stays still. The code is in &lt;a href=&quot;https://github.com/ChristianInterno/ChristianInterno.github.io/blob/main/assets/js/lake.js&quot;&gt;lake.js&lt;/a&gt;.&lt;/p&gt;</content>
+  </entry>
+</feed>

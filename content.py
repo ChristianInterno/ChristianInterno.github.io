@@ -211,7 +211,7 @@ THEMES = [
         "id": "distributed", "line": "dist",
         "title": "Distributed learning",
         "figure": "islands",
-        "caption": "Many islands, one walkway: the models travel, the data stays home.",
+        "caption": "Every island keeps its own data (the dots). Only the models (the squares) cross the walkways, to be merged on the island in the middle.",
         "text": "Many models, many owners, and data that never leaves home. I work on how such models can still learn together "
                 "when their data barely overlap, and how to keep that collaboration small, fast and private.",
         "questions": [
@@ -222,20 +222,6 @@ THEMES = [
         ],
         "papers": ["interno2026pruning", "interno2024fedlex", "moleri2026federatedfactory", "yuca2026ppflex"],
     },
-]
-
-# Newest first. "date" may be a month, a year, or a word such as "Seminar".
-TALKS = [
-    {"date": "Dec 2026", "next": True, "title": "GeoPhys: The Geometry of Physical Plausibility", "kind": "Poster",
-     "where": "NeurIPS 2026, Sydney"},
-    {"date": "Dec 2025", "title": "AI-Generated Video Detection via Perceptual Straightening", "kind": "Poster",
-     "where": "NeurIPS 2025, San Diego"},
-    {"date": "Dec 2024", "title": "Adaptive hybrid model pruning in federated learning", "kind": "Oral",
-     "where": "the International Workshop on Federated Foundation Models, NeurIPS 2024, Vancouver"},
-    {"date": "2024", "title": "European Graduate Network Symposium", "kind": "Talk",
-     "where": "the Honda Research Institute"},
-    {"date": "Earlier", "title": "Machine learning for signal disaggregation", "kind": "Seminar",
-     "where": "the University of Milano-Bicocca"},
 ]
 
 # glyph: bounce, straight, kinked, prune, landscape, signal, frames
@@ -259,6 +245,17 @@ CODE = [
      "text": "A digital-twin dataset for industrial energy disaggregation.",
      "links": [("GitHub", "https://github.com/ChristianInterno/SIDED")]},
 ]
+
+# the Collaborate page: a short invitation, then co-authors (taken from PAPERS), students and service
+COLLABORATE = [
+    'Most of my work is done with others. If you work on world models, physical reasoning or distributed learning, '
+    'or have a problem where they could help, write to me at '
+    '<a href="mailto:christian.interno@uni-bielefeld.de">christian.interno@uni-bielefeld.de</a>.',
+    'A few lines are enough to start: what you work on, and the question you have in mind.',
+]
+
+# posts themselves are Markdown files in posts/ (see build.py)
+BLOG_INTRO = "Notes on research, and on the things I build along the way."
 
 MENTORING = [
     {"date": "2025", "who": "Andrea Moleri", "where": "MSc student, University of Milano-Bicocca",

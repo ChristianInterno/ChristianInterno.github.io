@@ -4,7 +4,7 @@ Builds christianinterno.com from content.py.
 
     python3 build.py
 
-Writes index.html, one folder per page, 404.html, sitemap.xml, robots.txt,
+Writes index.html, one folder per page, a page per blog post (from posts/), the blog feed, 404.html, robots.txt,
 CNAME and .nojekyll next to this file. Needs nothing beyond Python 3.
 """
 import datetime
@@ -46,10 +46,10 @@ PAGES = [
      "and distributed learning."),
     ("publications/", "Publications", f"Publications · {ME}",
      f"Papers and preprints by {ME}, with BibTeX."),
-    ("talks/", "Talks", f"Talks · {ME}", f"Talks and posters by {ME}."),
     ("code/", "Code", f"Code · {ME}", f"Code and datasets by {ME}."),
-    ("mentoring/", "Mentoring", f"Mentoring and service · {ME}",
-     f"Students {ME} has mentored, reviewing, and volunteering."),
+    ("collaborate/", "Collaborate", f"Collaborate · {ME}",
+     f"Working with {ME}: how to get in touch, co-authors, students and service."),
+    ("blog/", "Blog", f"Blog · {ME}", f"Notes by {ME}."),
 ]
 
 esc = lambda s: html.escape(s, quote=True)
@@ -257,17 +257,51 @@ def figure_bounce():
             + _bounce(18, 22, 108.5, 5.2, 8, 0.75, 28, 2, 7.6) + _frame(240, 180, 5) + "</svg>")
 
 
+def _plank(a, b, w, seed):
+    """A straight walkway at any angle, coloured in with three strokes laid side by side across it."""
+    (x0, y0), (x1, y1) = a, b
+    L = math.hypot(x1 - x0, y1 - y0)
+    ux, uy = (x1 - x0) / L, (y1 - y0) / L
+    nx, ny = -uy, ux
+    n, out = max(2, math.ceil(L / 5)), []
+    for k, (o, ww, op) in enumerate(((-0.3, 0.42, .9), (0.0, 0.46, 1), (0.3, 0.42, .85))):
+        h = _hand(seed * 10 + k, 0.45)
+        line = [(x0 + ux * L * i / n + nx * (o * w + h(L * i / n)), y0 + uy * L * i / n + ny * (o * w + h(L * i / n)))
+                for i in range(n + 1)]
+        out.append(f'<polyline class="p" stroke-width="{ww * w:.1f}" opacity="{op}" points="{_pts(line)}"/>')
+    return "".join(out)
+
+
 def figure_islands():
-    arms = [[(46, 32), (120, 32), (120, 90)], [(206, 56), (206, 90), (120, 90)],
-            [(192, 152), (120, 152), (120, 90)], [(34, 130), (34, 90), (120, 90)]]
-    piers = "".join(_pier(a, 6, 10 + k) for k, a in enumerate(arms))
-    clients = "".join(_island(x, y, 8, 20 + k) for k, (x, y) in enumerate(((46, 32), (206, 56), (192, 152), (34, 130))))
-    return ('<svg class="tile" viewBox="0 0 240 180" role="img" aria-label="Four small islands joined to a central one by walkways">'
+    """Five islands, each with its own data, joined to a larger one by straight walkways at irregular angles.
+    The data (dots) stay on their islands; only the models (squares) go out on the walkways, to be merged
+    on the island in the middle."""
+    hx, hy, hr = 130, 96, 15
+    isles = [(44, 42, 9), (198, 34, 8), (214, 128, 9), (122, 160, 8), (36, 138, 7.5)]
+    masks = "".join(f'<circle class="s" cx="{x}" cy="{y}" r="{r + 3:.1f}"/>' for x, y, r in isles)
+    masks += f'<circle class="s" cx="{hx}" cy="{hy}" r="{hr + 3}"/>'
+    piers, land, dots, models = "", "", "", ""
+    for k, (x, y, r) in enumerate(isles):
+        L = math.hypot(hx - x, hy - y)
+        ux, uy = (hx - x) / L, (hy - y) / L
+        piers += _plank((x + ux * (r + 1), y + uy * (r + 1)), (hx - ux * (hr + 1), hy - uy * (hr + 1)), 5.5, 10 + k)
+        land += _loop(x, y, r, 20 + k)
+        rr = _rng(70 + k)
+        for _ in range(3):
+            a, d = rr() * 6.283, r * (0.2 + 0.4 * rr())
+            dots += f'<circle class="ball" cx="{x + d * math.cos(a):.1f}" cy="{y + d * math.sin(a):.1f}" r="1.3"/>'
+        if k in (0, 2, 3):
+            t = (r + 1 + (L - r - hr - 2) * (0.5 if k != 2 else 0.42)) / L
+            mx, my = x + (hx - x) * t, y + (hy - y) * t
+            ang = math.degrees(math.atan2(uy, ux))
+            models += f'<rect class="m" x="{mx - 4:.1f}" y="{my - 4:.1f}" width="8" height="8" transform="rotate({ang:.0f} {mx:.1f} {my:.1f})"/>'
+    hub = _loop(hx, hy, hr, 30) + f'<rect class="m" x="{hx - 5}" y="{hy - 5}" width="10" height="10" transform="rotate(-6 {hx} {hy})"/>'
+    return ('<svg class="tile" viewBox="0 0 240 180" role="img" '
+            'aria-label="Five small islands, each holding its own data, joined by straight walkways to a larger island; '
+            'the models travel along the walkways and are merged in the middle">'
             '<rect class="w" width="240" height="180"/>'
-            + _water((20, 48, 76, 106, 138, 168), 6, 234, 7)
-            + piers + clients + _island(120, 90, 13, 30)
-            + '<rect class="m" x="78" y="28" width="8" height="8" transform="rotate(-4 82 32)"/>'
-            + '<rect class="m" x="156" y="148" width="8" height="8" transform="rotate(5 160 152)"/>'
+            + _water((18, 46, 74, 104, 132, 164), 6, 234, 7)
+            + masks + piers + land + hub + dots + models
             + _frame(240, 180, 6) + "</svg>")
 
 
@@ -410,14 +444,15 @@ FOOT = f"""<footer class="foot">
 def page(path, body, title=None, desc=None, noindex=False, extra=""):
     meta = next((p for p in PAGES if p[0] == path), None)
     title = title or meta[2]
-    desc = desc or meta[3]
+    desc = desc or (meta[3] if meta else C.SITE["interests"])
     is_home = path == ""
     cls = "home" if is_home else "sub"
+    section = meta[0] if meta else next((p for p, *_ in PAGES if p and path.startswith(p)), None)
     return (head(path, title, desc, noindex, extra)
             + f'<body class="{cls}">\n<a class="skip" href="#content">Skip to content</a>\n<div class="frame">\n\n'
             + lake(is_home)
             + '\n\n<main class="shore" id="shore">\n  <svg id="walk-shore" class="walk" aria-hidden="true"></svg>\n  '
-            + menu(path if meta else None)
+            + menu(section)
             + '\n  <div id="content">\n'
             + body
             + "\n  </div>\n  " + FOOT + "\n</main>\n\n</div>\n</body>\n</html>\n")
@@ -546,23 +581,6 @@ def publications():
   </section>"""
 
 
-def talks():
-    rows = []
-    for t in C.TALKS:
-        d = "date next" if t.get("next") else "date"
-        rows.append(f'    <li class="row"><span class="{d}">{t["date"]}</span><div><p class="t">{t["title"]}</p>'
-                    f'<p class="where">{t["kind"]} at {t["where"]}</p></div></li>')
-    return f"""  <div class="pagehead tight">
-    <h1 class="title" id="anchor">Talks</h1>
-  </div>
-
-  <section class="col" data-rail aria-labelledby="anchor">
-  <ol class="feed talks">
-{chr(10).join(rows)}
-  </ol>
-  </section>"""
-
-
 def code():
     rows = []
     for c in C.CODE:
@@ -585,18 +603,34 @@ def code():
   </section>"""
 
 
-def mentoring():
+def surname_key(name):
+    import unicodedata
+    given, last = split_name(name)
+    flat = lambda t: unicodedata.normalize("NFKD", t).encode("ascii", "ignore").decode().lower()
+    return (flat(last[-1]), flat(" ".join(given)))
+
+
+def collaborate():
+    me = ME.replace("*", "")
+    people = sorted({a.rstrip("*") for p in C.PAPERS for a in p["authors"]} - {me}, key=surname_key)
+    names = ", ".join(f"<span>{esc(n)}</span>" for n in people)
     ment = "\n".join(
         f'    <li class="row"><span class="lab">{m["date"]}</span><p><b>{m["who"]}</b>, '
         f'<span class="where">{m["where"]}.</span> {m["what"]}</p></li>' for m in C.MENTORING)
     vol = "\n".join(f'    <li class="row"><span class="lab">{v["date"]}</span><p>{v["text"]}</p></li>'
                     for v in C.VOLUNTEERING)
     return f"""  <div class="pagehead">
-    <h1 class="title" id="anchor">Mentoring and service</h1>
+    <h1 class="title" id="anchor">Collaborate</h1>
+    {"".join(f"<p>{p}</p>" for p in C.COLLABORATE)}
   </div>
 
+  <section class="col" aria-labelledby="ppl-h">
+  <h2 id="ppl-h">People I have worked with</h2>
+  <p class="names">{names}.</p>
+  </section>
+
   <section class="col" aria-labelledby="men-h">
-  <h2 id="men-h">Mentoring</h2>
+  <h2 id="men-h">Students</h2>
   <ul class="plain">
 {ment}
   </ul>
@@ -613,6 +647,175 @@ def mentoring():
 {vol}
   </ul>
   </section>"""
+
+
+# ---------------------------------------------------------------- blog
+# Posts are Markdown files in posts/, each starting with a few lines of front matter:
+#     ---
+#     title: The lake on this page
+#     date: 2026-10-20
+#     summary: One sentence for the list of posts and for link previews.
+#     ---
+# The Markdown understood here is the everyday part: paragraphs, ## headings, - and 1. lists, > quotes,
+# ``` code blocks, *italics*, **bold**, `code`, [links](…) and ![pictures](…). Lines that start with "<"
+# are passed through as HTML. A file whose name starts with "_" is a draft and is not published.
+
+POSTS_DIR = os.path.join(ROOT, "posts")
+
+
+def md_inline(t):
+    out = []
+    for part in re.split(r"(`[^`]+`)", t):
+        if len(part) > 1 and part[0] == part[-1] == "`":
+            out.append("<code>" + esc(part[1:-1]) + "</code>")
+            continue
+        part = re.sub(r"!\[([^\]]*)\]\(([^)\s]+)\)", r'<img src="\2" alt="\1" loading="lazy">', part)
+        part = re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", r'<a href="\2">\1</a>', part)
+        part = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", part)
+        part = re.sub(r"(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])", r"<i>\1</i>", part)
+        out.append(part)
+    return "".join(out)
+
+
+def markdown(text):
+    html_out, para, items, kind, quote, code = [], [], [], None, [], None
+
+    def flush():
+        nonlocal para, items, kind, quote
+        if para:
+            html_out.append("<p>" + md_inline(" ".join(para)) + "</p>")
+        if items:
+            html_out.append(f"<{kind}>" + "".join(f"<li>{md_inline(i)}</li>" for i in items) + f"</{kind}>")
+        if quote:
+            html_out.append("<blockquote><p>" + md_inline(" ".join(quote)) + "</p></blockquote>")
+        para, items, kind, quote = [], [], None, []
+
+    for line in text.splitlines():
+        if code is not None:
+            if line.strip().startswith("```"):
+                html_out.append("<pre><code>" + esc("\n".join(code)) + "</code></pre>")
+                code = None
+            else:
+                code.append(line)
+            continue
+        st = line.strip()
+        if st.startswith("```"):
+            flush(); code = []
+        elif not st:
+            flush()
+        elif re.match(r"#{2,4} ", st):
+            flush()
+            n = len(st) - len(st.lstrip("#"))
+            html_out.append(f"<h{n}>{md_inline(st[n:].strip())}</h{n}>")
+        elif re.match(r"[-*] ", st):
+            if kind != "ul":
+                flush(); kind = "ul"
+            items.append(st[2:])
+        elif re.match(r"\d+\. ", st):
+            if kind != "ol":
+                flush(); kind = "ol"
+            items.append(st.split(" ", 1)[1])
+        elif st.startswith(">"):
+            if para or items:
+                flush()
+            quote.append(st[1:].strip())
+        elif st.startswith("<"):
+            flush(); html_out.append(st)
+        elif items and line.startswith("  "):
+            items[-1] += " " + st
+        else:
+            if items or quote:
+                flush()
+            para.append(st)
+    flush()
+    return "\n".join(html_out)
+
+
+def load_posts():
+    posts = []
+    if not os.path.isdir(POSTS_DIR):
+        return posts
+    for fn in sorted(os.listdir(POSTS_DIR)):
+        if not fn.endswith(".md") or fn.startswith("_"):
+            continue
+        with open(os.path.join(POSTS_DIR, fn), encoding="utf-8") as fh:
+            raw = fh.read()
+        meta, body = {}, raw
+        m = re.match(r"---\s*\n(.*?)\n---\s*\n", raw, re.S)
+        if m:
+            for ln in m.group(1).splitlines():
+                if ":" in ln:
+                    k, v = ln.split(":", 1)
+                    meta[k.strip()] = v.strip()
+            body = raw[m.end():]
+        slug = meta.get("slug") or re.sub(r"^\d{4}-\d{2}-\d{2}-", "", fn[:-3])
+        date = datetime.date.fromisoformat(meta["date"])
+        posts.append({"slug": slug, "title": meta["title"], "date": date, "summary": meta.get("summary", ""),
+                      "html": markdown(body)})
+    return sorted(posts, key=lambda p: p["date"], reverse=True)
+
+
+POSTS = load_posts()
+FEED_LINK = f'<link rel="alternate" type="application/atom+xml" title="{esc(ME)}: blog" href="/blog/feed.xml">\n'
+
+
+def nice_date(d):
+    return f"{d.day} {d.strftime('%B %Y')}"
+
+
+def blog():
+    if POSTS:
+        rows = "\n".join(
+            f'    <li class="row"><span class="date">{p["date"].strftime("%b %Y")}</span><div>'
+            f'<p class="t"><a href="/blog/{p["slug"]}/">{p["title"]}</a></p><p class="d">{p["summary"]}</p></div></li>'
+            for p in POSTS)
+        listing = f'<ol class="feed posts">\n{rows}\n  </ol>'
+    else:
+        listing = '<p class="prose">Nothing here yet.</p>'
+    return f"""  <div class="pagehead">
+    <h1 class="title">Blog</h1>
+    <p id="anchor">{C.BLOG_INTRO} There is a <a href="/blog/feed.xml">feed</a> for readers.</p>
+  </div>
+
+  <section class="col" data-rail aria-label="Posts">
+  {listing}
+  </section>"""
+
+
+def post(p):
+    return f"""  <article class="post" aria-labelledby="anchor">
+    <header class="pagehead tight">
+      <p class="kicker"><time datetime="{p["date"].isoformat()}">{nice_date(p["date"])}</time></p>
+      <h1 class="title" id="anchor">{p["title"]}</h1>
+    </header>
+    <div class="body">
+{p["html"]}
+    </div>
+    <p class="more back"><a href="/blog/">All posts</a></p>
+  </article>"""
+
+
+def atom():
+    updated = (POSTS[0]["date"] if POSTS else TODAY).isoformat() + "T00:00:00Z"
+    entries = "".join(f"""  <entry>
+    <title>{esc(plain(p["title"]))}</title>
+    <link href="{URL}/blog/{p["slug"]}/"/>
+    <id>{URL}/blog/{p["slug"]}/</id>
+    <updated>{p["date"].isoformat()}T00:00:00Z</updated>
+    <summary>{esc(plain(p["summary"]))}</summary>
+    <content type="html">{esc(p["html"])}</content>
+  </entry>
+""" for p in POSTS)
+    return f"""<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>{esc(ME)}</title>
+  <link href="{URL}/blog/"/>
+  <link rel="self" href="{URL}/blog/feed.xml"/>
+  <id>{URL}/blog/</id>
+  <updated>{updated}</updated>
+  <author><name>{esc(ME)}</name></author>
+{entries}</feed>
+"""
 
 
 def not_found():
@@ -652,13 +855,19 @@ def main():
     write("index.html", page("", home(), extra=person_ld()))
     write("research/index.html", page("research/", research()))
     write("publications/index.html", page("publications/", publications()))
-    write("talks/index.html", page("talks/", talks()))
     write("code/index.html", page("code/", code()))
-    write("mentoring/index.html", page("mentoring/", mentoring()))
+    write("collaborate/index.html", page("collaborate/", collaborate()))
+    write("blog/index.html", page("blog/", blog(), extra=FEED_LINK))
+    for p in POSTS:
+        write(f"blog/{p['slug']}/index.html",
+              page(f"blog/{p['slug']}/", post(p), title=f"{plain(p['title'])} · {ME}", desc=plain(p["summary"]) or None,
+                   extra=FEED_LINK))
+    write("blog/feed.xml", atom())
     write("404.html", page("404", not_found(), title=f"Not found · {ME}",
                            desc="There’s nothing at this address.", noindex=True))
     if LISTED:
         urls = "".join(f"  <url><loc>{URL}/{p}</loc><lastmod>{TODAY.isoformat()}</lastmod></url>\n" for p, *_ in PAGES)
+        urls += "".join(f"  <url><loc>{URL}/blog/{p['slug']}/</loc><lastmod>{p['date'].isoformat()}</lastmod></url>\n" for p in POSTS)
         write("sitemap.xml", '<?xml version="1.0" encoding="UTF-8"?>\n'
               '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + "</urlset>\n")
         write("robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {URL}/sitemap.xml\n")
@@ -669,7 +878,7 @@ def main():
         write("robots.txt", "User-agent: *\nAllow: /\n")
     write("CNAME", URL.split("://", 1)[1] + "\n")
     write(".nojekyll", "")
-    print("Built", len(PAGES), "pages + 404" + (" (with CV)" if HAS_CV else "") + ("" if LISTED else ", hidden from search engines") + ".")
+    print("Built", len(PAGES), "pages,", len(POSTS), "posts + 404" + (" (with CV)" if HAS_CV else "") + ("" if LISTED else ", hidden from search engines") + ".")
 
 
 if __name__ == "__main__":

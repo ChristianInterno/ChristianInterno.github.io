@@ -6,10 +6,11 @@ No framework and no build service. One Python script turns one content file into
 ## What's here
 
 ```
-content.py            everything the site says: bio, news, papers, talks, code, mentoring
+content.py            everything the site says: bio, news, papers, code, collaborators, students
 build.py              turns content.py into the pages:  python3 build.py
 index.html            About (generated, like every page below)
-research/  publications/  talks/  code/  mentoring/
+research/  publications/  code/  collaborate/  blog/
+posts/                the blog posts, one Markdown file each
 404.html              "Off the end of the pier"
 assets/css/site.css   all the styling; the colours are at the top
 assets/js/lake.js     the drawing and the water (linear wave theory), the walkway, the papers filter, BibTeX
@@ -29,7 +30,25 @@ Don't edit the generated `.html` files by hand: the next build overwrites them. 
 3. Commit and push, or upload the changed files on GitHub.
 
 Each paper's BibTeX is generated from its entry, so authors, venue and year only need to be right in one place.
-Mark equal contribution with a trailing `*` on the name. `"selected": True` puts a paper on the About page.
+Mark equal contribution with a trailing `*` on the name. The "People I have worked with" list on the Collaborate
+page is built from the authors in `PAPERS`, so it grows by itself.
+
+## Writing a blog post
+
+Add a Markdown file to `posts/`, for example `posts/2026-11-02-a-title.md`, starting with:
+
+```
+---
+title: A title
+date: 2026-11-02
+summary: One sentence for the list of posts and for link previews.
+---
+```
+
+Then write the post below it: paragraphs, `## headings`, `- lists`, `*italics*`, `**bold**`, `[links](https://…)`,
+`` `code` ``, code blocks between ``` lines, and `![pictures](/assets/img/…)`. A line that starts with `<` is
+passed through as HTML (handy for an equation). The address is `/blog/a-title/`. Rebuild, and the post shows up
+on the Blog page and in the feed at `/blog/feed.xml`. A file whose name starts with `_` is a draft and is skipped.
 
 ## Looking at it before it goes live
 

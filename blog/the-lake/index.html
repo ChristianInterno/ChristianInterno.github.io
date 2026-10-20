@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Talks · Christian Internò</title>
-<meta name="description" content="Talks and posters by Christian Internò.">
+<title>The lake on this page · Christian Internò</title>
+<meta name="description" content="Why there is a walkway on Lake Iseo next to my name, and the physics that moves the water around it.">
 <meta name="robots" content="noindex, nofollow">
-<link rel="canonical" href="https://christianinterno.com/talks/">
+<link rel="canonical" href="https://christianinterno.com/blog/the-lake/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Christian Internò">
-<meta property="og:url" content="https://christianinterno.com/talks/">
-<meta property="og:title" content="Talks · Christian Internò">
-<meta property="og:description" content="Talks and posters by Christian Internò.">
+<meta property="og:url" content="https://christianinterno.com/blog/the-lake/">
+<meta property="og:title" content="The lake on this page · Christian Internò">
+<meta property="og:description" content="Why there is a walkway on Lake Iseo next to my name, and the physics that moves the water around it.">
 <meta property="og:image" content="https://christianinterno.com/assets/img/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -24,9 +24,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,400..800;1,62..125,400..800&amp;family=Caveat:wght@400;600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/site.css?v=795fa3cc">
+<link rel="stylesheet" href="/assets/css/site.css?v=1ed9e8cc">
 <script src="/assets/js/lake.js?v=15a7684c" defer></script>
 <noscript><style>.bibbox[hidden]{display:block}</style></noscript>
+<link rel="alternate" type="application/atom+xml" title="Christian Internò: blog" href="/blog/feed.xml">
 </head>
 <body class="sub">
 <a class="skip" href="#content">Skip to content</a>
@@ -52,21 +53,29 @@
 
 <main class="shore" id="shore">
   <svg id="walk-shore" class="walk" aria-hidden="true"></svg>
-  <nav class="menu" aria-label="Pages"><a href="/">About</a><a href="/research/">Research</a><a href="/publications/">Publications</a><a href="/talks/" aria-current="page">Talks</a><a href="/code/">Code</a><a href="/mentoring/">Mentoring</a></nav>
+  <nav class="menu" aria-label="Pages"><a href="/">About</a><a href="/research/">Research</a><a href="/publications/">Publications</a><a href="/code/">Code</a><a href="/collaborate/">Collaborate</a><a href="/blog/" aria-current="page">Blog</a></nav>
   <div id="content">
-  <div class="pagehead tight">
-    <h1 class="title" id="anchor">Talks</h1>
-  </div>
-
-  <section class="col" data-rail aria-labelledby="anchor">
-  <ol class="feed talks">
-    <li class="row"><span class="date next">Dec 2026</span><div><p class="t">GeoPhys: The Geometry of Physical Plausibility</p><p class="where">Poster at NeurIPS 2026, Sydney</p></div></li>
-    <li class="row"><span class="date">Dec 2025</span><div><p class="t">AI-Generated Video Detection via Perceptual Straightening</p><p class="where">Poster at NeurIPS 2025, San Diego</p></div></li>
-    <li class="row"><span class="date">Dec 2024</span><div><p class="t">Adaptive hybrid model pruning in federated learning</p><p class="where">Oral at the International Workshop on Federated Foundation Models, NeurIPS 2024, Vancouver</p></div></li>
-    <li class="row"><span class="date">2024</span><div><p class="t">European Graduate Network Symposium</p><p class="where">Talk at the Honda Research Institute</p></div></li>
-    <li class="row"><span class="date">Earlier</span><div><p class="t">Machine learning for signal disaggregation</p><p class="where">Seminar at the University of Milano-Bicocca</p></div></li>
-  </ol>
-  </section>
+  <article class="post" aria-labelledby="anchor">
+    <header class="pagehead tight">
+      <p class="kicker"><time datetime="2026-10-20">20 October 2026</time></p>
+      <h1 class="title" id="anchor">The lake on this page</h1>
+    </header>
+    <div class="body">
+<p>I grew up on Lake Iseo. For sixteen days in the summer of 2016, from 18 June to 3 July, Christo and Jeanne-Claude’s <i>The Floating Piers</i> joined Sulzano to Monte Isola and the small island of San Paolo: about three kilometres of walkway, 226,000 floating cubes and 70,000 square metres of yellow fabric. More than a million people walked across the lake. The orange line on this site is that walkway.</p>
+<p>The water next to it is not a looping animation. It is a small simulation, and since physical plausibility is what I work on, it seemed only fair that the drawing should get its physics right.</p>
+<h2>Waves on deep water</h2>
+<p>For small waves on deep water, a wave of wavenumber <i>k</i> = 2π/<i>λ</i> oscillates at a frequency fixed by the dispersion relation</p>
+<p class="eq"><i>ω</i>² = <i>gk</i> + (<i>σ</i>/<i>ρ</i>) <i>k</i>³</p>
+<p>The first term is gravity pulling the crests down; the second is surface tension <i>σ</i> (over the density <i>ρ</i>) pulling the surface flat. Long waves are ruled by gravity and short ripples by surface tension, and the two disagree about speed. Among long waves the longest travel fastest; among ripples the shortest do. In between lies a slowest wave: on real water it is about 1.7 cm long and moves at about 23 cm/s.</p>
+<p>On this page the constants are scaled so that the slowest wave is about a hundred pixels long. That puts both kinds of wave on the screen at once: the long waves from the breeze roll in slowly, and when you touch the water, the short ripples run out ahead of everything else.</p>
+<p>Waves also fade, the short ones much faster than the long ones. Viscosity <i>ν</i> takes their energy at a rate that grows with the square of the wavenumber, <i>γ</i> = <i>γ</i>₀ + 2<i>νk</i>², so a ripple lives for a moment and a swell for much longer.</p>
+<h2>Solving it exactly</h2>
+<p>The breeze is seven wave trains, each with its own length and heading, each moving at the speed the dispersion relation gives it.</p>
+<p>The ripples are where the equations earn their keep. Because the theory is linear, the surface can be written as a sum of Fourier modes on a periodic grid of 256 × 64, and each mode is then a little oscillator of its own. Its step forward in time can be written down exactly: a rotation by <i>ω</i>(<i>k</i>)Δ<i>t</i> in its own phase space, and a shrink by e<sup>−<i>γ</i>(<i>k</i>)Δ<i>t</i></sup>. No error builds up and nothing blows up, however long the page stays open. A touch adds a small Gaussian dent to the surface, which in Fourier space is a Gaussian too, so it goes into every mode at once. One inverse FFT per frame turns the spectrum back into heights, and the pencil lines follow them.</p>
+<p>Move the pointer across the water to leave a wake, or tap it to drop a stone. If your system asks for reduced motion, the lake stays still. The code is in <a href="https://github.com/ChristianInterno/ChristianInterno.github.io/blob/main/assets/js/lake.js">lake.js</a>.</p>
+    </div>
+    <p class="more back"><a href="/blog/">All posts</a></p>
+  </article>
   </div>
   <footer class="foot">
     <div class="jetty" aria-hidden="true"></div>

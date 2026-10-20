@@ -86,6 +86,7 @@ h1.title{margin:0 0 1.4rem;font-weight:650;font-stretch:108%;font-size:clamp(2re
 .pagehead{max-width:46rem;margin-bottom:3.2rem}
 .pagehead p{max-width:40rem;color:var(--soft);font-size:1.02rem;text-wrap:pretty}
 .pagehead.tight{margin-bottom:0}
+.pagehead p + p{margin-top:.75rem}
 h2{margin:0 0 1.3rem;font-weight:650;font-stretch:106%;font-size:1.35rem;line-height:1.15;letter-spacing:-.015em}
 h3{margin:0 0 .8rem;font-weight:600;font-size:1.05rem;line-height:1.3}
 section + section{margin-top:3.6rem}
@@ -122,10 +123,33 @@ details.earlier[open] > summary{display:none}
 .card p{font-size:.95rem;line-height:1.6;text-wrap:pretty}
 .card .more{margin-top:.6rem}
 
-/* talks */
-.talks li + li{margin-top:1.2rem}
-.talks .t{font-size:.97rem}
-.talks .where{margin-top:.1rem;font-size:.86rem}
+/* collaborate */
+.names{max-width:42rem;font-size:.97rem;line-height:1.85;text-wrap:pretty}
+.names span{white-space:nowrap}
+
+/* blog */
+.posts li + li{margin-top:1.4rem}
+.posts .t{font-size:1.02rem}
+.posts .t a{text-decoration:none}
+.posts .t a:hover{text-decoration:underline;text-decoration-color:var(--pier);text-decoration-thickness:2px}
+.posts .d{margin-top:.2rem;font-size:.92rem;line-height:1.55;color:var(--soft);text-wrap:pretty}
+.post{max-width:40rem}
+.post .kicker{margin:0 0 .7rem;font-size:.88rem;font-weight:600;color:var(--soft)}
+.post h1.title{margin-bottom:0;text-wrap:balance}
+.post .body{margin-top:2.2rem}
+.post .body p,.post .body li{font-size:1.04rem;line-height:1.72;text-wrap:pretty}
+.post .body > * + *{margin-top:1.05rem}
+.post .body h2{margin-top:2.6rem;margin-bottom:-.2rem;font-size:1.2rem}
+.post .body h3{margin-top:2rem;margin-bottom:-.3rem}
+.post .body ul,.post .body ol{padding-left:1.3rem}
+.post .body li + li{margin-top:.35rem}
+.post .body blockquote{margin-left:0;margin-right:0;padding-left:1rem;border-left:3px solid var(--pier)}
+.post .body pre{padding:.9rem 1rem;border:1.2px solid var(--ink);border-radius:3px 9px 4px 8px / 8px 3px 9px 4px;
+  font:.8rem/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:auto}
+.post .body code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.9em}
+.post .body img{display:block;max-width:100%;height:auto}
+.post .body .eq{margin-top:1.4rem;margin-bottom:1.4rem;text-align:center;font-size:1.15rem;letter-spacing:.01em}
+.post .back{margin-top:2.8rem}
 
 /* papers */
 .badge{justify-self:start;font-size:.8rem;font-weight:600;line-height:1.4;white-space:nowrap;color:var(--ink)}
