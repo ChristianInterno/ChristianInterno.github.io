@@ -26,6 +26,16 @@ ME = C.SITE["name"]
 HAS_CV = os.path.exists(os.path.join(ROOT, C.SITE["cv"]))
 LISTED = C.SITE.get("listed", True)
 
+
+def _v(rel):
+    """A short fingerprint of a file, so browsers fetch it again whenever it changes."""
+    import hashlib
+    with open(os.path.join(ROOT, rel), "rb") as fh:
+        return hashlib.sha1(fh.read()).hexdigest()[:8]
+
+
+V_CSS, V_JS, V_ME = _v("assets/css/site.css"), _v("assets/js/lake.js"), _v("assets/img/me.jpg")
+
 # (folder, menu label, <title>, meta description)
 PAGES = [
     ("", "About", ME,
@@ -333,8 +343,8 @@ def head(path, title, desc, noindex=False, extra=""):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,400..800;1,62..125,400..800&amp;family=Caveat:wght@400;600&amp;display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/site.css">
-<script src="/assets/js/lake.js" defer></script>
+<link rel="stylesheet" href="/assets/css/site.css?v={V_CSS}">
+<script src="/assets/js/lake.js?v={V_JS}" defer></script>
 <noscript><style>.bibbox[hidden]{{display:block}}</style></noscript>
 {extra}</head>
 """
@@ -351,7 +361,7 @@ def lake(is_home):
     {name}
     <p class="who" id="who"><b>{C.SITE["title"]}</b>{C.SITE["interests"]}</p>
   </div>
-  <img class="me" id="me" src="/assets/img/me.jpg" width="640" height="640" alt="Portrait of {esc(ME)}">
+  <img class="me" id="me" src="/assets/img/me.jpg?v={V_ME}" width="640" height="640" alt="Portrait of {esc(ME)}">
   <p class="map" id="lbl-lake" aria-hidden="true">Lago d’Iseo, simulated</p>
   <nav class="links" id="links" aria-label="Contact and profiles">
     {links}
