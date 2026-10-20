@@ -162,13 +162,14 @@ h3.group:first-of-type{margin-top:0}
 .t{font-weight:600;line-height:1.38;text-wrap:balance}
 .au{margin-top:.2rem;font-size:.85rem;line-height:1.5;color:var(--soft)}
 .au b{font-weight:600;color:var(--ink)}
+.sum{margin-top:.35rem;font-size:.92rem;line-height:1.55;max-width:38rem;text-wrap:pretty}
 .meta{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.85rem;row-gap:.1rem;margin-top:.15rem;font-size:.85rem;color:var(--soft)}
 .meta .venue{color:var(--ink);font-style:italic}
 .bibtoggle{padding:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.22em;text-decoration-color:color-mix(in srgb,currentColor 45%,transparent)}
 .bibtoggle:hover{text-decoration-color:var(--pier);text-decoration-thickness:2px}
 .bibtoggle[aria-expanded="true"]{color:var(--ink)}
 .flag{margin-top:.3rem;font-size:.85rem;font-weight:600}
-.flag::before,.qs li::before{content:"";display:inline-block;width:.55rem;height:.5rem;margin-right:.5rem;background:var(--pier);
+.flag::before{content:"";display:inline-block;width:.55rem;height:.5rem;margin-right:.5rem;background:var(--pier);
   border-radius:42% 58% 50% 46% / 56% 44% 58% 42%;vertical-align:.05em}
 .bibbox{position:relative;margin-top:.6rem}
 .bibbox pre{margin:0;padding:.9rem 1rem;background:var(--paper);color:var(--ink);border:1.2px solid var(--ink);
@@ -186,19 +187,6 @@ h3.group:first-of-type{margin-top:0}
 .lab{color:var(--soft);font-weight:600;font-variant-numeric:tabular-nums;font-size:.88rem}
 .plain p{font-size:.97rem;text-wrap:pretty}
 .plain b{font-weight:600}
-
-/* research */
-.theme{display:grid;grid-template-columns:minmax(0,15rem) minmax(0,1fr);column-gap:2.2rem;align-items:start;max-width:60rem}
-.theme + .theme{margin-top:4.2rem}
-.theme figure{margin:.3rem 0 0}
-.theme figcaption{margin-top:.65rem;font-size:.82rem;line-height:1.5;color:var(--soft);text-wrap:pretty}
-.theme h2{font-size:1.3rem;line-height:1.2;margin-bottom:.8rem;text-wrap:balance}
-.theme .text{font-size:1.02rem;line-height:1.65;text-wrap:pretty}
-.qs{list-style:none;margin:1.3rem 0 0;padding:0}
-.qs li{position:relative;padding-left:1.1rem;font-size:.97rem;text-wrap:pretty}
-.qs li::before{position:absolute;left:0;top:.55em;margin:0}
-.qs li + li{margin-top:.55rem}
-.qs a{color:var(--soft);font-size:.85rem;font-weight:600;margin-left:.3rem;white-space:nowrap}
 
 /* small drawings: research figures and code tiles */
 .tile{display:block;width:100%;height:auto;overflow:visible}
@@ -244,10 +232,8 @@ footer.foot i{color:var(--ink)}
   .links{position:relative!important;left:auto;right:auto;bottom:auto;margin-top:.6rem}
   :root{--side:1.25rem}
   .shore{padding-top:1.4rem}
-  .theme{grid-template-columns:minmax(0,1fr);row-gap:1.4rem}
   .cards{grid-template-columns:minmax(0,1fr)}
   .card figure{max-width:22rem}
-  .theme figure{max-width:22rem}
   /* inner pages: the band shrinks to a name, so the page starts right away */
   body.sub .lake{padding:1.5rem 1.25rem 1.35rem}
   body.sub .lake .who,body.sub .lake .me,body.sub .lake .links{display:none}

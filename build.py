@@ -41,11 +41,8 @@ PAGES = [
     ("", "About", ME,
      f"{ME} is a machine learning researcher working on representation learning, world models, "
      "physical reasoning and distributed learning."),
-    ("research/", "Research", f"Research · {ME}",
-     f"Research by {ME}: the geometry of learned representations, world models and physical reasoning, "
-     "and distributed learning."),
     ("publications/", "Publications", f"Publications · {ME}",
-     f"Papers and preprints by {ME}, with BibTeX."),
+     f"Papers and preprints by {ME} on world models, physical reasoning and distributed learning, with BibTeX."),
     ("code/", "Code", f"Code · {ME}", f"Code and datasets by {ME}."),
     ("collaborate/", "Collaborate", f"Collaborate · {ME}",
      f"Working with {ME}: how to get in touch, co-authors, students and service."),
@@ -477,6 +474,8 @@ def paper(p, bib=False):
     out = [f'    <li class="row" id="{p["key"]}" data-line="{p["line"]}"><span class="{badge}">{p["badge"]}</span><div>',
            f'      <p class="t">{p["title"]}</p>',
            f'      <p class="au">{authors}</p>']
+    if p.get("summary"):
+        out.append(f'      <p class="sum">{p["summary"]}</p>')
     if meta:
         out.append('      <div class="meta">' + "".join(meta) + "</div>")
     if bib:
@@ -505,7 +504,7 @@ def home():
         news += '\n  <details class="earlier"><summary>Earlier news</summary>\n  ' + feed(earlier) + "\n  </details>"
     cards = "\n".join(f"""    <article class="card">
       <figure>{FIGURES[t["figure"]]()}</figure>
-      <h3><a href="/research/#{t["id"]}">{t["title"]}</a></h3>
+      <h3><a href="/publications/?line={t["line"]}">{t["title"]}</a></h3>
       <p>{t["text"]}</p>
       <p class="more"><a href="/publications/?line={t["line"]}">The papers</a></p>
     </article>""" for t in C.THEMES)
@@ -525,30 +524,6 @@ def home():
 {cards}
   </div>
   </section>"""
-
-
-def research():
-    blocks = []
-    for t in C.THEMES:
-        qs = "\n".join(
-            f'        <li>{q} <a href="/publications/#{k}">{BY_KEY[k]["short"]}</a></li>' for q, k in t["questions"])
-        blocks.append(f"""  <section class="theme" id="{t["id"]}" aria-labelledby="{t["id"]}-h">
-    <figure>{FIGURES[t["figure"]]()}<figcaption>{t["caption"]}</figcaption></figure>
-    <div>
-      <h2 id="{t["id"]}-h">{t["title"]}</h2>
-      <p class="text">{t["text"]}</p>
-      <ul class="qs">
-{qs}
-      </ul>
-      <p class="more"><a href="/publications/?line={t["line"]}">All papers on {C.LINES[t["line"]][0].lower() + C.LINES[t["line"]][1:]}</a></p>
-    </div>
-  </section>""")
-    return f"""  <div class="pagehead">
-    <h1 class="title" id="anchor">Research</h1>
-    <p>{C.RESEARCH_INTRO}</p>
-  </div>
-
-""" + "\n\n".join(blocks)
 
 
 def publications():
@@ -852,7 +827,6 @@ def write(rel, text):
 
 def main():
     write("index.html", page("", home(), extra=person_ld()))
-    write("research/index.html", page("research/", research()))
     write("publications/index.html", page("publications/", publications()))
     write("code/index.html", page("code/", code()))
     write("collaborate/index.html", page("collaborate/", collaborate()))

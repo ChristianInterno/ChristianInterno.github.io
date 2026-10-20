@@ -9,7 +9,7 @@ No framework and no build service. One Python script turns one content file into
 content.py            everything the site says: bio, news, papers, code, collaborators, students
 build.py              turns content.py into the pages:  python3 build.py
 index.html            About (generated, like every page below)
-research/  publications/  code/  collaborate/  blog/
+publications/  code/  collaborate/  blog/
 posts/                the blog posts, one Markdown file each
 404.html              "Off the end of the pier"
 assets/css/site.css   all the styling; the colours are at the top

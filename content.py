@@ -36,7 +36,7 @@ BIO = [
     'my PhD is funded by the <a href="https://www.honda-ri.de/">Honda Research Institute Europe</a>. After a Visiting Fellowship in '
     'Philip Torr’s <a href="https://torrvision.com/">Torr Vision Group</a> at the <a href="https://www.ox.ac.uk/">University of Oxford</a>, '
     'I continue to work with the group on world models.',
-    'My <a href="/research/">research</a> focuses on world models and physical reasoning: I read the geometry of learned '
+    'My <a href="/publications/">research</a> focuses on world models and physical reasoning: I read the geometry of learned '
     'representations to find out what neural networks know about physics, and use it to tell whether a generated video could '
     'really happen. Broadly, I want physical plausibility to become something we can measure: principled ways to read physics '
     'out of a model, and to put that structure to work as a prior for learning, a verifier at inference time and a diagnostic '
@@ -80,6 +80,7 @@ LINES = {"rep": "World models and physical reasoning", "dist": "Distributed lear
 PAPERS = [
     {
         "key": "interno2026geophys", "short": "GeoPhys", "kind": "pub", "line": "rep", "year": 2026, "selected": True,
+        "summary": "Five geometric measures of a video’s path through frozen image encoders tell physically plausible videos from implausible ones without any training, and, used as a verifier, pick the most plausible of a video generator’s candidates.",
         "title": "GeoPhys: The Geometry of Physical Plausibility",
         "authors": ["Christian Internò", "Alexander Pondaven", "Habon Issa", "Fabio Pizzati", "Francesco Pinto",
                     "Markus Olhofer", "Ivan Laptev", "Philip Torr", "Eero P. Simoncelli", "Barbara Hammer", "David Klindt"],
@@ -91,6 +92,7 @@ PAPERS = [
     },
     {
         "key": "kutluozen2026linear", "short": "Linear probe", "kind": "pub", "line": "rep", "year": 2026, "selected": True,
+        "summary": "A linear probe that reads a property out of a network is often taken as proof that the network represents it linearly; we ask when that conclusion actually holds.",
         "title": "Is a Linear Probe Evidence of a Linear Representation?",
         "authors": ["Nadir Kutluozen*", "Christian Internò*", "David Klindt"],
         "badge": "NeurIPS 2026", "venue": "", "bib": "conf", "booktitle": "Advances in Neural Information Processing Systems",
@@ -99,6 +101,7 @@ PAPERS = [
     },
     {
         "key": "interno2026pruning", "short": "AutoFLIP", "kind": "pub", "line": "dist", "year": 2026, "selected": True,
+        "summary": "Clients explore the loss landscape together once before training, and that shared map guides how the federated model is pruned, cutting computation by about half and communication by about two thirds on non-IID data.",
         "title": "Pruning Federated Models Through Loss Landscape Analysis and Client Agreement Scoring",
         "authors": ["Christian Internò", "Elena Raponi", "Markus Olhofer", "Ali Raza", "Thomas Bäck", "Niki van Stein",
                     "Yaochu Jin", "Barbara Hammer"],
@@ -111,6 +114,7 @@ PAPERS = [
     },
     {
         "key": "yuca2026ppflex", "short": "PPFLex", "kind": "pub", "line": "dist", "year": 2026,
+        "summary": "Secure multi-party computation for the optimisation of federated models on non-IID data, so that collaborating does not mean revealing what each client holds.",
         "title": "PPFLex: Securing Non-IID Optimization in Federated Learning via MPC",
         "authors": ["Nergiz Yuca", "Christian Internò", "Nikolay Matyunin", "Markus Olhofer", "Barbara Hammer", "Stefan Katzenbeisser"],
         "badge": "AAAI-W 2026", "venue": "AAAI 2026 Workshop on Federated Learning for Critical Applications", "bib": "conf",
@@ -119,6 +123,7 @@ PAPERS = [
     },
     {
         "key": "interno2025restrav", "short": "ReStraV", "kind": "pub", "line": "rep", "year": 2025, "selected": True,
+        "summary": "Real videos trace straighter paths than generated ones through the representations of a self-supervised vision model, and a small classifier on that curvature spots AI-generated video.",
         "title": "AI-Generated Video Detection via Perceptual Straightening",
         "authors": ["Christian Internò", "Robert Geirhos", "Markus Olhofer", "Sunny Liu", "Barbara Hammer", "David Klindt"],
         "badge": "NeurIPS 2025", "venue": "", "bib": "conf", "booktitle": "Advances in Neural Information Processing Systems",
@@ -128,6 +133,7 @@ PAPERS = [
     },
     {
         "key": "cadei2025narcissus", "short": "Narcissus Hypothesis", "kind": "pub", "line": "other", "year": 2025,
+        "summary": "Personality assessments and a new social-desirability score across 31 foundation models show them drifting toward agreeable, socially conforming answers.",
         "title": "The Narcissus Hypothesis: Descending to the Rung of Illusion",
         "authors": ["Riccardo Cadei*", "Christian Internò*"],
         "badge": "NeurIPS-W 2025", "venue": "NeurIPS 2025 Workshop on Evaluating the Evolving LLM Lifecycle", "bib": "conf",
@@ -136,6 +142,7 @@ PAPERS = [
     },
     {
         "key": "interno2024fedlex", "short": "FedLEx", "kind": "pub", "line": "dist", "year": 2024, "selected": True,
+        "summary": "Clients measure how their gradients deviate across parameters, and the steering matrix built from that short exploration guides federated training on non-IID data.",
         "title": "Federated Loss Exploration for Improved Convergence on Non-IID Data",
         "authors": ["Christian Internò", "Markus Olhofer", "Yaochu Jin", "Barbara Hammer"],
         "badge": "IJCNN 2024", "venue": "", "bib": "conf", "booktitle": "2024 International Joint Conference on Neural Networks (IJCNN)",
@@ -145,6 +152,7 @@ PAPERS = [
     },
     {
         "key": "karmann2026motionjepa", "short": "MotionJEPA", "kind": "pre", "line": "rep", "year": 2026,
+        "summary": "A regulariser that predicts embeddings of frame differences keeps JEPA world models from holding on to slow features only, giving fuller latents and better planning.",
         "title": "MotionJEPA: Preventing Temporal Feature Collapse by Capturing Visual Changes in Latent Space",
         "authors": ["Markus Karmann*", "Shile Li*", "Christian Internò", "Bruno Andreis", "David Klindt", "Randall Balestriero",
                     "Jindong Gu", "Philip Torr", "Qi Zhang", "Peng-Tao Jiang", "Hao Zhang", "Bo Li", "Onay Urfalioglu"],
@@ -153,6 +161,7 @@ PAPERS = [
     },
     {
         "key": "shinnick2026procedural", "short": "Procedural Core", "kind": "pre", "line": "rep", "year": 2026,
+        "summary": "A small recurrent transformer pretrained on procedurally generated data is expanded to initialise vision transformers of any size, and lifts ViT-Base on ImageNet by 2.2 points.",
         "title": "Procedural Core: A Compact Recurrent Initialization for Vision Transformers",
         "authors": ["Zachary Shinnick", "Christian Internò", "Hemanth Saratchandran", "Anton van den Hengel", "Damien Teney"],
         "badge": "arXiv 2026", "venue": "", "bib": "arxiv", "arxiv": "2609.37631",
@@ -160,6 +169,7 @@ PAPERS = [
     },
     {
         "key": "interno2026observer", "short": "Observer Effect", "kind": "pre", "line": "rep", "year": 2026,
+        "summary": "Adapting a world model to read out its physics can change the physics it represents; PhyIP reads it from frozen features instead, with a lightweight probe.",
         "title": "The Observer Effect in World Models: Invasive Adaptation Corrupts Latent Physics",
         "authors": ["Christian Internò", "Jumpei Yamaguchi", "Loren Amdahl-Culleton", "Markus Olhofer", "David Klindt", "Barbara Hammer"],
         "badge": "arXiv 2026", "venue": "", "bib": "arxiv", "arxiv": "2602.12218",
@@ -167,6 +177,7 @@ PAPERS = [
     },
     {
         "key": "moleri2026federatedfactory", "short": "FederatedFactory", "kind": "pre", "line": "dist", "year": 2026,
+        "summary": "Each client sends a generative model instead of model weights, so a single round of communication is enough even when every client holds different classes.",
         "title": "FederatedFactory: Generative One-Shot Learning for Extremely Non-IID Distributed Scenarios",
         "authors": ["Andrea Moleri*", "Christian Internò*", "Ali Raza", "Markus Olhofer", "David Klindt", "Fabio Stella", "Barbara Hammer"],
         "badge": "arXiv 2026", "venue": "", "bib": "arxiv", "arxiv": "2603.16370",
@@ -174,6 +185,7 @@ PAPERS = [
     },
     {
         "key": "interno2025industrial", "short": "SIDED", "kind": "pre", "line": "other", "year": 2025,
+        "summary": "A digital-twin dataset of industrial energy use, and a light augmentation method that helps models disaggregate complex equipment such as combined heat and power plants.",
         "title": "Industrial Energy Disaggregation with Digital Twin-generated Dataset and Efficient Data Augmentation",
         "authors": ["Christian Internò", "Andrea Castellani", "Sebastian Schmitt", "Fabio Stella", "Barbara Hammer"],
         "badge": "arXiv 2025", "venue": "", "bib": "arxiv", "arxiv": "2506.20525",
@@ -183,44 +195,20 @@ PAPERS = [
 
 PATENTS = "Inventor on two European patent applications from my work at the Honda Research Institute."
 
-RESEARCH_INTRO = (
-    "I look for geometric structure in learned representations that we can put to work in three ways: "
-    "as a prior that makes learning better, as a verifier at inference time, and as a diagnostic that flags anomalies. "
-    "Most of what I do sits in two lines of work."
-)
-
 THEMES = [
     {
         "id": "representations", "line": "rep",
         "title": "World models and physical reasoning",
         "figure": "bounce",
-        "caption": "A ball bouncing on the walkway, one dot per frame. Real physics leaves a regular trace like this; GeoPhys looks for it in the path a video takes through a frozen image encoder.",
         "text": "Neural networks see the world through their representations. I ask what those representations encode about physics, "
                 "and how to read it out without changing the model in the process.",
-        "questions": [
-            ("Is physical plausibility written into the geometry of frozen image features?", "interno2026geophys"),
-            ("Do real and generated videos trace different paths through a perceptual representation?", "interno2025restrav"),
-            ("When is a successful linear probe evidence of a linear representation?", "kutluozen2026linear"),
-            ("Does adapting a model to read out its physics change the physics it represents?", "interno2026observer"),
-            ("How do we keep video world models from losing what changes between frames?", "karmann2026motionjepa"),
-            ("Can procedural data give vision transformers a better start?", "shinnick2026procedural"),
-        ],
-        "papers": ["interno2026geophys", "interno2025restrav", "kutluozen2026linear", "interno2026observer"],
     },
     {
         "id": "distributed", "line": "dist",
         "title": "Distributed learning",
         "figure": "islands",
-        "caption": "Every island keeps its own data (the dots). Only the models (the squares) cross the walkways, to be merged on the island in the middle.",
         "text": "Many models, many owners, and data that never leaves home. I work on how such models can still learn together "
                 "when their data barely overlap, and how to keep that collaboration small, fast and private.",
-        "questions": [
-            ("How can federated training converge when the clients’ data barely overlap?", "interno2024fedlex"),
-            ("Can a single round of communication be enough when every client sees a single class?", "moleri2026federatedfactory"),
-            ("How do we prune federated models without losing what each client knows?", "interno2026pruning"),
-            ("How do we keep collaborative optimisation private and secure?", "yuca2026ppflex"),
-        ],
-        "papers": ["interno2026pruning", "interno2024fedlex", "moleri2026federatedfactory", "yuca2026ppflex"],
     },
 ]
 
