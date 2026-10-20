@@ -274,7 +274,9 @@ VOLUNTEERING = [
     {"date": "2018", "text": "Educational sports activities and teaching in Malawi, with the Sacramentine Sisters."},
 ]
 
-FOOTNOTE = ("I grew up on Lake Iseo. The walkway is for Christo and Jeanne-Claude’s <i>The Floating Piers</i>, "
-            "which crossed the lake to Monte Isola in the summer of 2016. The water beside it follows linear wave theory "
-            "for deep water, <i>ω</i>² = <i>gk</i> + (<i>σ</i>/<i>ρ</i>)<i>k</i>³: the breeze’s long waves roll in slowly, "
-            "and the short ripples from a touch run out ahead of them. Move across the water, or tap it.")
+FOOTNOTE = ("I grew up on Lake Iseo, Italy. The walkway is for Christo and Jeanne-Claude’s "
+            '<a href="https://en.wikipedia.org/wiki/The_Floating_Piers"><i>The Floating Piers</i></a>, '
+            "which crossed the lake to Monte Isola in the summer of 2016. The water beside it follows "
+            '<a href="/blog/the-lake/">linear wave theory for deep water</a>, '
+            '<span class="nw"><i>ω</i>² = <i>gk</i> + (<i>σ</i>/<i>ρ</i>)<i>k</i>³</span>: the breeze’s long waves roll in slowly, '
+            "and the short ripples from a touch run out ahead of them.")

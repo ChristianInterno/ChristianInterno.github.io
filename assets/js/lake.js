@@ -300,9 +300,9 @@
     me.style.width="";
     if(wide){
       var lk=rel(links,lake), gap=16;
-      cap.style.left=Math.round(id.l)+"px"; cap.style.top=Math.round(lk.t-36)+"px";
+      if(cap){cap.style.left=Math.round(id.l)+"px"; cap.style.top=Math.round(lk.t-36)+"px";}
       peakScale=clamp(LW/500,0.65,1.1)*clamp((LH-560)/340,0.45,1);
-      top=Math.round(id.b+26+102*peakScale); bottom=Math.round(lk.t-36-22);
+      top=Math.round(id.b+26+102*peakScale); bottom=Math.round(lk.t-30);
       var mw=me.offsetWidth;
       if(mw>bottom-top-2*gap-24){ mw=Math.max(96,bottom-top-2*gap-24); me.style.width=mw+"px"; }
       me.style.left=Math.round(Math.max(gap+16,LW*.2))+"px";
@@ -325,7 +325,7 @@
       }
       lakeSegs=[[[0,y0],[m.l+2,y0]],right];
     } else {
-      me.removeAttribute("style"); cap.removeAttribute("style");
+      me.removeAttribute("style"); if(cap) cap.removeAttribute("style");
       if(me.offsetWidth){
         var m2=rel(me,lake);
         peakScale=clamp(LW/520,0.55,0.8);

@@ -231,6 +231,7 @@ footer.foot{margin-top:4.5rem;padding:0 0 2.6rem;color:var(--soft);font-size:.85
 footer.foot p{max-width:40rem;text-wrap:pretty}
 footer.foot p + p{margin-top:.6rem}
 footer.foot i{color:var(--ink)}
+.nw{white-space:nowrap}
 .jetty{height:12px;width:calc(var(--side) + 4.5rem);margin:0 0 1.5rem calc(-1 * var(--side));background:var(--mark-line) 0 0/100% 100% no-repeat}
 
 /* ---------- small screens: the drawing becomes a band at the top ---------- */
