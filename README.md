@@ -12,7 +12,7 @@ index.html            About (generated, like every page below)
 research/  publications/  talks/  code/  mentoring/
 404.html              "Off the end of the pier"
 assets/css/site.css   all the styling; the colours are at the top
-assets/js/lake.js     the water (a small wave-equation solver), the walkway, the papers filter, BibTeX
+assets/js/lake.js     the drawing and the water (linear wave theory), the walkway, the papers filter, BibTeX
 assets/img/           me.jpg, og.png (link preview), favicon.svg, apple-touch-icon.png
 CNAME                 christianinterno.com
 .nojekyll  robots.txt  sitemap.xml
@@ -57,12 +57,14 @@ and shows up at christianinterno.com/GeoPhys/ by itself.
   rebuild and push; then add the site in Google Search Console to have it picked up quickly.
 
 - **CV**: save a PDF as `assets/cv.pdf` and rebuild; a "CV" item appears in the menu.
-- **Photo**: `assets/img/me.jpg` is 200×200. A square photo of 600×600 or more, under the same name, looks sharper.
+- **Photo**: `assets/img/me.jpg`, square, 640×640. Replace it with another square photo under the same name.
 - **Colours**: black and white, with the walkway as the only colour: `--paper`, `--ink`, `--graphite` (the pencil lines) and `--pier` (the orange). Dark mode swaps paper and ink, like chalk on a blackboard. The name and the caption under the lake are set in Caveat, to read like handwriting on the drawing.
 - **The walkway** finds the "Recently" heading on the About page and runs through the dates; on Talks it runs
   through the talk dates. One section per page can carry `data-rail`; its `class="date"` labels become the landings.
-- **The water** is simulated with the 2D wave equation. Moving the pointer over it, or tapping it, makes ripples
-  that reflect off the portrait and fade; the walkway rides them, moored at its ends. With reduced motion switched
-  on in the system settings, the water stays still.
+- **The water** follows linear wave theory for deep water: every Fourier mode moves with the gravity–capillary
+  dispersion relation ω² = gk + (σ/ρ)k³ and fades at γ = γ₀ + 2νk². A light breeze keeps a few wave trains rolling
+  across; a tap or a sweep of the pointer drops a disturbance that is stepped exactly in Fourier space (an FFT per
+  frame), so the short ripples run out ahead of the long ones. The constants are at the top of the physics section in
+  lake.js. The walkway is moored and doesn't move. With reduced motion switched on, the water stays still.
 - **Lines of work**: `LINES` in content.py names the two lines; each paper's `line` puts it in one, which drives
   the grouping on the About page and the filter on Publications (`/publications/?line=dist` links straight to it).

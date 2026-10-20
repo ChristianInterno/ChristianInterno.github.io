@@ -1,19 +1,21 @@
 /* Lago d'Iseo, simulated, and drawn by hand.
-   The water is a small solver for the 2D wave equation, drawn as pencil lines. The orange walkway
-   floats on it, moored at the shore, at the island (the portrait) and where it reaches the page;
-   on the page it carries the dates. Move across the water, or tap it, and the ripples travel,
-   reflect off the island and fade. */
+
+   The water follows linear wave theory for deep water. Every wave travels at the speed its length
+   allows, from the dispersion relation for gravity–capillary waves,
+       ω(k)² = g·k + (σ/ρ)·k³ ,
+   and fades through viscosity at the rate γ(k) = γ₀ + 2νk². A light breeze keeps a few wave trains
+   moving across the lake; a touch or a sweep of the pointer drops a disturbance into the same water,
+   evolved exactly mode by mode in Fourier space, so long waves run ahead of short ones, as they do
+   when a stone falls in. The orange walkway is moored and stays put; on the page it carries the dates. */
 (function(){
   "use strict";
-  var NS="http://www.w3.org/2000/svg", root=document.documentElement;
+  var NS="http://www.w3.org/2000/svg", root=document.documentElement, TAU=Math.PI*2;
   function $(id){return document.getElementById(id);}
   var lake=$("lake"), shore=$("shore");
   if(!lake||!shore) return;
   var water=$("water"), ws=$("walk-shore"), me=$("me"), who=$("who"), links=$("links"), cap=$("lbl-lake"),
       anchor=$("anchor"), rail=document.querySelector("[data-rail]"), home=document.body.classList.contains("home");
 
-  // where the island sat (per window size), so every page shows the same lake;
-  // and whether the walkway has already been laid out in this visit
   function keep(area){return {
     get:function(k){try{return JSON.parse(window[area].getItem(k));}catch(e){return null;}},
     set:function(k,v){try{window[area].setItem(k,JSON.stringify(v));}catch(e){}}
@@ -31,66 +33,104 @@
   function rand(seed){var s=(seed*7919+13)%2147483647||1; return function(){s=(s*16807)%2147483647;return (s-1)/2147483646;};}
   // a hand is never ruler-straight: a slow, seeded wobble for every stroke
   function hand(seed,amp){
-    var r=rand(seed), p0=r()*6.283, p1=r()*6.283, p2=r()*6.283; amp=amp||1;
+    var r=rand(seed), p0=r()*TAU, p1=r()*TAU, p2=r()*TAU; amp=amp||1;
     return function(x){return amp*(0.55*Math.sin(x/61+p0)+0.32*Math.sin(x/27+p1)+0.16*Math.sin(x/11.5+p2));};
   }
-  function breaks(seed,len){       // pencil strokes: long runs with short lifts, different on every line
-    var r=rand(seed), out=[], total=0; r(); r();
-    while(total<len+400){var on=50+r()*230, off=5+r()*16; out.push(on.toFixed(0),off.toFixed(0)); total+=on+off;}
-    return out.join(" ");
-  }
 
-  /* ---------- the water: height h(x,y,t) on a coarse grid, leapfrog steps of the wave equation ---------- */
-  var W=null, V=null, simRaf=0, running=false, quiet=0;
+  /* ---------- physics ---------- */
+  // units: pixels and seconds. g and σ/ρ put the gravity–capillary crossover near 100 px, so the
+  // breeze's long waves roll by slowly while the short ripples from a touch run out fast ahead of them
+  var G=160, SIG=40000, NU=0.9, GAM0=0.2;
+  function omega(k){return Math.sqrt(G*k+SIG*k*k*k);}
+  function decay(k){return GAM0+2*NU*k*k;}
 
-  function makeWater(width,top,bottom,isle){
-    var cs=7, nx=Math.ceil(width/cs)+2, ny=Math.max(4,Math.ceil((bottom-top)/cs)+2), n=nx*ny;
-    var fixed=new Uint8Array(n), damp=new Float32Array(n);
-    for(var j=0;j<ny;j++) for(var i=0;i<nx;i++){
-      var k=j*nx+i, x=i*cs, y=top+j*cs, edge=Math.min(i,j,nx-1-i,ny-1-j);
-      if(edge===0) fixed[k]=1;                                     // beyond the drawing
-      if(isle){var dx=x-isle.x, dy=y-isle.y; if(dx*dx+dy*dy<isle.r*isle.r) fixed[k]=1;}   // waves reflect off the island
-      damp[k]=0.995*(edge<5?0.9+0.02*edge:1);                      // a soft sponge, so the edges don't echo
+  // the breeze: a handful of wave trains from the west, each moving at its own phase speed ω/k
+  var trains=(function(){
+    var r=rand(17), out=[];
+    for(var j=0;j<7;j++){
+      var lam=70+r()*190, k=TAU/lam, th=(r()-0.5)*0.8;
+      out.push({kx:k*Math.cos(th),ky:k*Math.sin(th),w:omega(k),a:(0.55+0.6*r())*Math.pow(lam/160,0.9),p:r()*TAU});
     }
-    W={top:top,cs:cs,nx:nx,ny:ny,h:new Float32Array(n),p:new Float32Array(n),fixed:fixed,damp:damp};
-  }
-  function step(){
-    var h=W.h,p=W.p,f=W.fixed,d=W.damp,nx=W.nx,ny=W.ny,c2=0.2,top=0;
-    for(var j=1;j<ny-1;j++){var r=j*nx;
-      for(var i=1;i<nx-1;i++){var k=r+i;
-        if(f[k]){p[k]=0;continue;}
-        var v=(2*h[k]-p[k]+c2*(h[k-1]+h[k+1]+h[k-nx]+h[k+nx]-4*h[k]))*d[k];
-        p[k]=v; v=v<0?-v:v; if(v>top) top=v;
-      }}
-    W.h=p; W.p=h; return top;
-  }
-  // a long, low swell frozen in place: the lake at rest is never perfectly flat
-  function swell(x,y){
-    return 1.1*Math.sin(x/53+y/37)+0.7*Math.sin(x/23-y/61+1.3)+0.45*Math.sin(x/11+y/17+2.1);
-  }
-  function height(x,y){
-    if(!W) return 0;
-    var gx=x/W.cs, gy=(y-W.top)/W.cs, nx=W.nx;
-    if(gx<0||gy<0||gx>W.nx-1.001||gy>W.ny-1.001) return 0;
-    var i=gx|0, j=gy|0, fx=gx-i, fy=gy-j, k=j*nx+i, h=W.h;
-    return (h[k]*(1-fx)+h[k+1]*fx)*(1-fy)+(h[k+nx]*(1-fx)+h[k+nx+1]*fx)*fy;
-  }
-  function poke(x,y,amount){
-    if(!W||still) return;
-    var gi=Math.round(x/W.cs), gj=Math.round((y-W.top)/W.cs);
-    for(var dj=-3;dj<=3;dj++) for(var di=-3;di<=3;di++){
-      var i=gi+di, j=gj+dj; if(i<1||j<1||i>=W.nx-1||j>=W.ny-1) continue;
-      var k=j*W.nx+i; if(!W.fixed[k]) W.h[k]+=amount*Math.exp(-(di*di+dj*dj)/4);
+    return out;
+  })();
+  var A_TOT=trains.reduce(function(s,w){return s+w.a;},0);
+  function breeze(x,y,t){var s=0; for(var j=0;j<trains.length;j++){var w=trains[j]; s+=w.a*Math.cos(w.kx*x+w.ky*y-w.w*t+w.p);} return s;}
+
+  // ripples: the same water, held as Fourier modes on a periodic grid and stepped exactly
+  var R=null;
+  function fft(re,im,n,stride,off,inv,tmpR,tmpI,rev,cs,sn){
+    var i,j,len,half,step,k,a,b,tr,ti,wr,wi,ur,ui;
+    for(i=0;i<n;i++){j=rev[i]; tmpR[i]=re[off+j*stride]; tmpI[i]=im[off+j*stride];}
+    for(len=2;len<=n;len<<=1){
+      half=len>>1; step=n/len;
+      for(i=0;i<n;i+=len){
+        for(k=0;k<half;k++){
+          wr=cs[k*step]; wi=inv?sn[k*step]:-sn[k*step];
+          a=i+k; b=a+half;
+          tr=tmpR[b]*wr-tmpI[b]*wi; ti=tmpR[b]*wi+tmpI[b]*wr;
+          ur=tmpR[a]; ui=tmpI[a];
+          tmpR[a]=ur+tr; tmpI[a]=ui+ti; tmpR[b]=ur-tr; tmpI[b]=ui-ti;
+        }
+      }
     }
-    if(!running&&!document.hidden){running=true; quiet=0; simRaf=requestAnimationFrame(tick);}
+    for(i=0;i<n;i++){re[off+i*stride]=tmpR[i]; im[off+i*stride]=tmpI[i];}
   }
-  function tick(){
-    var top=step(); draw();
-    if(top<0.05){ if(++quiet>45){running=false; return;} } else quiet=0;
-    simRaf=requestAnimationFrame(tick);
+  function tables(n){
+    var bits=Math.log2(n)|0, rev=new Int32Array(n), cs=new Float64Array(n/2), sn=new Float64Array(n/2);
+    for(var i=0;i<n;i++){var r=0,x=i; for(var b=0;b<bits;b++){r=(r<<1)|(x&1); x>>=1;} rev[i]=r;}
+    for(var k=0;k<n/2;k++){cs[k]=Math.cos(TAU*k/n); sn[k]=Math.sin(TAU*k/n);}
+    return {rev:rev,cs:cs,sn:sn,tr:new Float64Array(n),ti:new Float64Array(n)};
+  }
+  function makeRipples(LW,top,bottom){
+    // twice the width of the drawing, so ripples fade out long before the periodic grid could bring them back
+    var N=256, M=64, Lx=LW*2, Ly=(bottom-top)*1.6, x0=-LW*0.5, y0=top-(bottom-top)*0.3, dt=1/60;
+    var n=N*M, kx=new Float64Array(n), ky=new Float64Array(n), C=new Float64Array(n), S=new Float64Array(n),
+        E=new Float64Array(n), Wk=new Float64Array(n);
+    for(var j=0;j<M;j++) for(var i=0;i<N;i++){
+      var q=j*N+i, fx=i<N/2?i:i-N, fy=j<M/2?j:j-M, ax=TAU*fx/Lx, ay=TAU*fy/Ly, k=Math.sqrt(ax*ax+ay*ay), w=omega(k);
+      kx[q]=ax; ky[q]=ay; Wk[q]=w; C[q]=Math.cos(w*dt); S[q]=Math.sin(w*dt); E[q]=Math.exp(-decay(k)*dt);
+    }
+    R={N:N,M:M,Lx:Lx,Ly:Ly,x0:x0,y0:y0,dx:Lx/N,dy:Ly/M,kx:kx,ky:ky,C:C,S:S,E:E,W:Wk,
+       hr:new Float64Array(n),hi:new Float64Array(n),vr:new Float64Array(n),vi:new Float64Array(n),
+       fr:new Float64Array(n),fi:new Float64Array(n),tx:tables(N),ty:tables(M),live:0,energy:0,peak:0};
+  }
+  function stepRipples(){
+    var n=R.N*R.M, hr=R.hr, hi=R.hi, vr=R.vr, vi=R.vi, C=R.C, S=R.S, E=R.E, W=R.W, e=0;
+    for(var q=1;q<n;q++){             // each mode turns in its own phase space, and loses a little energy
+      var w=W[q], c=C[q], s=S[q], f=E[q];
+      var a=hr[q], b=hi[q], u=vr[q], v=vi[q];
+      hr[q]=(a*c+u/w*s)*f; hi[q]=(b*c+v/w*s)*f;
+      vr[q]=(-a*w*s+u*c)*f; vi[q]=(-b*w*s+v*c)*f;
+      e+=hr[q]*hr[q]+hi[q]*hi[q];
+    }
+    R.energy=e; if(e>R.peak) R.peak=e;
+    // back to the surface: an inverse FFT along rows, then along columns
+    var N=R.N, M=R.M, fr=R.fr, fi=R.fi;
+    fr.set(hr); fi.set(hi);
+    for(var j=0;j<M;j++) fft(fr,fi,N,1,j*N,true,R.tx.tr,R.tx.ti,R.tx.rev,R.tx.cs,R.tx.sn);
+    for(var i=0;i<N;i++) fft(fr,fi,M,N,i,true,R.ty.tr,R.ty.ti,R.ty.rev,R.ty.cs,R.ty.sn);
+  }
+  function ripple(x,y){
+    if(!R||!R.live) return 0;
+    var gx=(x-R.x0)/R.dx, gy=(y-R.y0)/R.dy, N=R.N, M=R.M;
+    if(gx<0||gy<0||gx>N-1.001||gy>M-1.001) return 0;
+    var i=gx|0, j=gy|0, fx=gx-i, fy=gy-j, q=j*N+i, f=R.fr;
+    return (f[q]*(1-fx)+f[q+1]*fx)*(1-fy)+(f[q+N]*(1-fx)+f[q+N+1]*fx)*fy;
+  }
+  // a stone, or a fingertip: a small Gaussian dent in the surface, added to every mode at once
+  function drop(x,y,amp,width){
+    if(!R||still) return;
+    var n=R.N*R.M, s=width||9, norm=amp*TAU*s*s/(R.Lx*R.Ly), X=x-R.x0, Y=y-R.y0;
+    for(var q=1;q<n;q++){
+      var kx=R.kx[q], ky=R.ky[q], g=norm*Math.exp(-(kx*kx+ky*ky)*s*s/2), ph=-(kx*X+ky*Y);
+      R.hr[q]+=g*Math.cos(ph); R.hi[q]+=g*Math.sin(ph);
+    }
+    R.live=1; wake();
   }
 
-  /* ---------- drawing ---------- */
+  /* ---------- the drawing ---------- */
+  var V=null, raf=0, running=false, t0=0, tNow=0;
+
   // the walkway is coloured in like pastel: four strokes side by side, each with its own wobble
   var BAND=[[-3.4,3.6,.9],[-1.15,4,1],[1.15,4,1],[3.4,3.6,.85]];
   function strokes(parent,cls,sw,seed){
@@ -98,97 +138,148 @@
       p.setAttribute("opacity",b[2]); parent.appendChild(p); return {el:p,o:b[0]*sw/10,h:hand(seed*10+k,0.55)};});
   }
   function colour(band,a){
-    var n=a.length/2, across=[];      // wobble across the stroke: up and down on level runs, sideways on steep ones
-    for(var i=0;i<n;i++){var j=i<n-1?i+1:i-1, dx=Math.abs(a[2*j]-a[2*i]), dy=Math.abs(a[2*j+1]-a[2*i+1]); across.push(dy>dx);}
+    var n=a.length/2, steep=[];
+    for(var i=0;i<n;i++){var j=i<n-1?i+1:i-1, dx=Math.abs(a[2*j]-a[2*i]), dy=Math.abs(a[2*j+1]-a[2*i+1]); steep.push(dy>dx);}
     band.forEach(function(s){var b=[];
-      for(var i=0;i<n;i++){var x=a[2*i], y=a[2*i+1], w=s.h(x+y);
-        b.push(x+s.o+(across[i]?w:0), y+s.o+(across[i]?0:w));}
+      for(var i=0;i<n;i++){var x=a[2*i], y=a[2*i+1], w=s.h(x+y); b.push(x+s.o+(steep[i]?w:0), y+s.o+(steep[i]?0:w));}
       s.el.setAttribute("points",pts(b));});
   }
-  function draw(){
-    if(!V) return;
-    var dx=6, i, x, a;
-    V.lines.forEach(function(ln){
-      var m=[], g=[];
-      for(x=ln.x0;x<=ln.x1;x+=dx){
-        var w=ln.g*(ln.s*swell(x,ln.y)+height(x,ln.y));
-        m.push(x, ln.y+w+ln.h(x)); g.push(x+0.6, ln.y+0.95+w+ln.h2(x));
-      }
-      ln.el.setAttribute("points",pts(m)); ln.el2.setAttribute("points",pts(g));
-    });
-    V.spans.forEach(function(sp){
-      a=[];
-      sp.legs.forEach(function(lg){                 // each straight run floats, moored at both ends
-        var len=lg.b-lg.a, n=Math.max(1,Math.ceil(len/6));
-        for(i=0;i<=n;i++){ x=lg.a+len*i/n;
-          a.push(x, lg.y+0.75*Math.sin(Math.PI*i/n)*(0.6*swell(x,lg.y)+height(x,lg.y))); }
-      });
-      colour(sp.band,a);
-    });
+  function dense(segs,step){
+    var out=[];
+    for(var j=0;j<segs.length-1;j++){var a=segs[j], b=segs[j+1], m=Math.max(1,Math.ceil((Math.abs(b[0]-a[0])+Math.abs(b[1]-a[1]))/step));
+      for(var t=0;t<m;t++) out.push(a[0]+(b[0]-a[0])*t/m, a[1]+(b[1]-a[1])*t/m);}
+    var z=segs[segs.length-1]; out.push(z[0],z[1]); return out;
   }
-  function spanLen(sp){var L=0; sp.legs.forEach(function(lg,k){L+=lg.b-lg.a; if(k) L+=Math.abs(lg.y-sp.legs[k-1].y);}); return L;}
-  function sketch(parent,cls,a,b){   // a pencil line drawn twice, the second time lighter
-    var p=node("polyline",cls); p.setAttribute("points",pts(a)); parent.appendChild(p);
-    if(b){var q=node("polyline",cls+" ghost"); q.setAttribute("points",pts(b)); parent.appendChild(q);}
-  }
-  function ridge(parent,LW,base,scale,xmax){  // the far shore: mountains, sketched, with a fainter range behind
-    function profile(peaks,seed,amp){
-      var h=hand(seed,amp), crag=hand(seed+7,amp*0.9), a=[];
-      for(var x=0;x<=xmax;x+=4){
-        var u=x/LW, y=base;
-        peaks.forEach(function(p){y-=scale*p[1]*Math.exp(-Math.abs(u-p[0])/p[2]);});
-        a.push(x,y+h(x)+crag(x*3.1));
-      }
-      return a;
-    }
-    var back=profile([[0.2,20,0.09],[0.42,30,0.07],[0.66,26,0.08],[0.92,18,0.06]],81,1.2).map(function(v,i){return i%2?v-9:v;});
-    var bk=node("polyline","ink ghost"); bk.setAttribute("points",pts(back)); bk.setAttribute("opacity",".3"); parent.appendChild(bk);
-    var front=[[0.07,16,0.05],[0.27,30,0.07],[0.5,44,0.085],[0.73,24,0.06],[0.9,13,0.05]];
-    sketch(parent,"ink",profile(front,71,1.1),profile(front,72,1.4).map(function(v,i){return i%2?v+1.1:v+0.8;}));
-    // a little shading down the far side of the highest peak
-    var hs=node("g","hatch"), px=LW*0.5;
-    for(var k=0;k<8&&px+6+k*6.5<xmax;k++){
-      var x=px+6+k*6.5, u=x/LW, y=base;
-      front.forEach(function(p){y-=scale*p[1]*Math.exp(-Math.abs(u-p[0])/p[2]);});
-      var l=node("line","ln"); l.setAttribute("x1",x.toFixed(1)); l.setAttribute("y1",(y+3).toFixed(1));
-      l.setAttribute("x2",(x-5).toFixed(1)); l.setAttribute("y2",(y+3+Math.min(14,base-y-2)).toFixed(1)); l.setAttribute("opacity",".55");
-      hs.appendChild(l);
-    }
-    parent.appendChild(hs);
-  }
-  function ring(parent,cx,cy,r){             // the island's shore, one loop of the pencil
-    var h=hand(91,1.2), a=[], b=[];
-    for(var t=0;t<=6.283*1.07;t+=0.05){var rr=r+h(t*90)+t*0.22, q=t-1.9; a.push(cx+rr*Math.cos(q),cy+rr*Math.sin(q));}
-    for(t=0.3;t<=6.283*0.98;t+=0.06){var r2=r+1.4+h(t*90+200)*0.8, q2=t-1.6; b.push(cx+r2*Math.cos(q2),cy+r2*Math.sin(q2));}
-    sketch(parent,"ink",a,b);
-  }
-
-  // On the About page the walkway reaches for the news: when the "Recently" landing is level with the
-  // water, the last stretch of the walkway bends to meet it, and follows it while you scroll.
-  var tRaf=0;
-  function requestTether(){ if(!tRaf) tRaf=requestAnimationFrame(function(){tRaf=0; tether(true);}); }
-  function tether(redraw){
-    var T=V&&V.tether; if(!T) return;
-    var entry=T.yIn+shore.getBoundingClientRect().top-lake.getBoundingClientRect().top;
-    var near=entry>=T.lo&&entry<=T.hi, goal=near?entry:T.y0;
-    if(T.locked&&near) T.cur=goal;
-    else { T.cur+=(goal-T.cur)*0.22; if(Math.abs(goal-T.cur)<0.6){T.cur=goal; T.locked=near;} else requestTether(); }
-    if(!near) T.locked=false;
-    var y=Math.round(T.cur);
-    T.sp.legs=Math.abs(y-T.y0)<1?[{a:T.a,b:V.LW,y:T.y0}]:[{a:T.a,b:T.xb,y:T.y0},{a:T.xb,b:V.LW,y:y}];
-    if(redraw) draw();
-  }
-
-  /* ---------- the walkway on the page ---------- */
   function plen(p){var L=0;for(var i=1;i<p.length;i++)L+=Math.abs(p[i][0]-p[i-1][0])+Math.abs(p[i][1]-p[i-1][1]);return L;}
-  function lay(el,delay){           // draw a line in, once, the first time the walkway is laid out
-    var BIG=10000;                   // longer than any walkway, so later bends never fall into the gap
+  function lay(el,delay){           // the pen draws the walkway in, once, the first time you visit
+    var BIG=10000;
     el.style.strokeDasharray=BIG+" "+BIG; el.style.strokeDashoffset=BIG;
     el.style.transition="stroke-dashoffset "+Math.round(BIG/1.1)+"ms linear "+Math.round(delay)+"ms";
   }
+  function line(parent,cls,a,attrs){var p=node("polyline",cls); p.setAttribute("points",pts(a));
+    if(attrs) for(var k in attrs) p.setAttribute(k,attrs[k]); parent.appendChild(p); return p;}
+
+  // value noise and fractal sums of it: the roughness of real ridgelines repeats at every scale
+  function noise1(seed){
+    var r=rand(seed), v=new Float64Array(1024); for(var i=0;i<1024;i++) v[i]=r()*2-1;
+    return function(x){var i=Math.floor(x), f=x-i, u=f*f*(3-2*f), a=v[i&1023], b=v[(i+1)&1023]; return a+(b-a)*u;};
+  }
+  function fbm(n,x,oct){var s=0,amp=1,f=1,norm=0; for(var o=0;o<oct;o++){s+=amp*n(x*f+o*17.31); norm+=amp; amp*=0.52; f*=2.07;} return s/norm;}
+
+  // the mountains around the lake: three ranges, the nearest one wooded and shaded
+  function mountains(parent,LW,shoreY,scale,xmax){
+    function range(masses,seed,freq,oct,rough){
+      var n=noise1(seed), n2=noise1(seed+5), a=[];
+      for(var x=0;x<=xmax;x+=3){
+        var u=x/LW, env=0;
+        for(var j=0;j<masses.length;j++){var m=masses[j], z=(u-m[0])/m[2]; env+=m[1]*Math.exp(-z*z);}
+        var detail=fbm(n,u*freq,oct), crag=1-Math.abs(fbm(n2,u*freq*2.3,3));
+        var hgt=env*(0.78+rough*detail)+env*0.12*crag;
+        a.push(x,shoreY-scale*Math.max(0,hgt));
+      }
+      return a;
+    }
+    var g=node("g","hills"); parent.appendChild(g);
+    var fa=range([[0.1,84,0.15],[0.5,104,0.2],[0.88,80,0.13]],61,5,4,0.28),
+        ma=range([[0.04,46,0.09],[0.3,74,0.12],[0.6,60,0.11],[0.9,54,0.1]],71,8,5,0.34),
+        na=range([[0.13,30,0.08],[0.37,44,0.075],[0.6,26,0.08],[0.84,48,0.07]],81,11,5,0.4);
+    var hf=hand(62,0.6), hm=hand(72,0.7), hn=hand(82,0.8);
+    function wob(a,h,dy){return a.map(function(v,i){return i%2?v+h(a[i-1])+(dy||0):v;});}
+    line(g,"ink",wob(fa,hf),{opacity:".24","stroke-width":".8"});
+    line(g,"ink",wob(ma,hm),{opacity:".55","stroke-width":"1"});
+    line(g,"ink",wob(na,hn),{"stroke-width":"1.35"});
+    line(g,"ink",wob(na,hand(83,1),1.1),{opacity:".38","stroke-width":".7"});
+    // shading: short strokes down the slopes that turn away from the light (it comes from the left)
+    var sh=node("g","shade"), r=rand(23);
+    [[ma,0.6,7,0.45,9],[na,1,4.5,0.7,15]].forEach(function(set){
+      var a=set[0];
+      for(var i=6;i<a.length-6;i+=2){
+        var x=a[i], y=a[i+1], slope=(a[i+7]-a[i-5])/(a[i+6]-a[i-6]);
+        if(slope>0.18&&r()<set[3]){
+          var depth=shoreY-y, len=Math.min(depth-4,set[4],(5+r()*10)*set[1]+Math.min(slope,1.5)*4);
+          if(len<3) continue;
+          var l=node("line","hatch"); l.setAttribute("x1",x.toFixed(1)); l.setAttribute("y1",(y+2).toFixed(1));
+          l.setAttribute("x2",(x-len*0.42).toFixed(1)); l.setAttribute("y2",(y+2+len).toFixed(1));
+          l.setAttribute("opacity",(0.3+0.4*set[1]).toFixed(2)); sh.appendChild(l);
+          i+=2*Math.round(set[2]);          // skip a few points; stay on x entries of the flat [x,y,x,y…] list
+        }
+      }
+    });
+    g.appendChild(sh);
+    // woods on the near slopes: little conifers in clumps, thinning out where the hills drop to the water
+    var woods=node("g","woods"), rr=rand(29), forest=noise1(31);
+    for(var i3=0;i3<na.length;i3+=2){
+      var x=na[i3], ridgeY=na[i3+1], relief=shoreY-ridgeY;
+      var dens=clamp(0.55+0.9*fbm(forest,x/70,3),0,1);
+      if(rr()>dens*0.55||relief<4) continue;
+      var y=shoreY-rr()*Math.min(relief*0.55,16), hgt=3.5+rr()*5.5;
+      var tree=node("path","tree");
+      tree.setAttribute("d","M"+x.toFixed(1)+","+y.toFixed(1)+"v"+(-hgt).toFixed(1)+
+        "M"+(x-hgt*0.32).toFixed(1)+","+(y-hgt*0.3).toFixed(1)+"L"+x.toFixed(1)+","+(y-hgt*1.05).toFixed(1)+"L"+(x+hgt*0.32).toFixed(1)+","+(y-hgt*0.3).toFixed(1));
+      woods.appendChild(tree);
+    }
+    g.appendChild(woods);
+    // the hills again, upside down and broken up by the water just below the shore
+    var refl=node("g","refl");
+    for(var i2=0;i2<na.length-2;i2+=14){
+      var xx=na[i2], depth2=shoreY-na[i2+1];
+      for(var k=0;k<2;k++){
+        var yy=shoreY+5+k*6+rr()*2, w2=(3+depth2*0.35)*(1-k*0.3)*(0.5+rr()*0.7);
+        if(w2<3) continue;
+        var l2=node("line","ln"); l2.setAttribute("x1",(xx-w2/2).toFixed(1)); l2.setAttribute("x2",(xx+w2/2).toFixed(1));
+        l2.setAttribute("y1",yy.toFixed(1)); l2.setAttribute("y2",yy.toFixed(1)); l2.setAttribute("opacity",(0.45-k*0.15).toFixed(2));
+        refl.appendChild(l2);
+      }
+    }
+    g.appendChild(refl);
+  }
+  function birds(parent,x0,y0,n,seed){
+    var r=rand(seed), g=node("g","birds");
+    for(var i=0;i<n;i++){
+      var x=x0+i*(16+r()*14), y=y0+(r()-0.5)*18, s=4.5+r()*3.5, tilt=(r()-0.5)*0.4;
+      var p=node("path","ink");
+      p.setAttribute("d","M"+(x-s).toFixed(1)+","+(y+tilt*s).toFixed(1)+"q"+(s*0.45).toFixed(1)+","+(-s*0.75).toFixed(1)+" "+s.toFixed(1)+","+(-tilt*s+s*0.1).toFixed(1)+
+        "q"+(s*0.5).toFixed(1)+","+(-s*0.9).toFixed(1)+" "+(s*1.05).toFixed(1)+","+(-s*0.25).toFixed(1));
+      p.setAttribute("stroke-width","1.1"); g.appendChild(p);
+    }
+    parent.appendChild(g);
+  }
+  function ring(parent,cx,cy,r){             // the island's shore, one loop of the pencil
+    var h=hand(91,1.2), a=[], b=[];
+    for(var t=0;t<=TAU*1.07;t+=0.04){var rr=r+h(t*90)+t*0.22, q=t-1.9; a.push(cx+rr*Math.cos(q),cy+rr*Math.sin(q));}
+    for(t=0.3;t<=TAU*0.98;t+=0.05){var r2=r+1.6+h(t*90+200)*0.8, q2=t-1.6; b.push(cx+r2*Math.cos(q2),cy+r2*Math.sin(q2));}
+    line(parent,"ink",a,{"stroke-width":"1.3"}); line(parent,"ink",b,{"stroke-width":".7",opacity:".45"});
+  }
+
+  // the surface, every frame: a pencil line per row of water, darker and heavier where the crests stand up
+  function draw(){
+    if(!V) return;
+    var t=tNow, dx=5;
+    for(var i=0;i<V.rows.length;i++){
+      var ln=V.rows[i], base=[], crest="", on=false, y, x;
+      for(x=ln.x0;x<=ln.x1;x+=dx){
+        var hb=breeze(x*ln.zoom,ln.y*2.2,t), hr=ripple(x,ln.y), hn=(hb+ln.rip*hr)/A_TOT;
+        y=ln.y+ln.g*(hb+ln.rip*hr)+ln.h(x);
+        base.push(x,y);
+        if(hn>ln.th){ crest+=(on?"L":"M")+x.toFixed(1)+","+(y-0.4).toFixed(1); on=true; } else on=false;
+      }
+      ln.el.setAttribute("points",pts(base));
+      ln.cr.setAttribute("d",crest||"M0,0");
+    }
+  }
+  function frame(now){
+    if(!running) return;
+    if(!t0) t0=now;
+    tNow=(now-t0)/1000;
+    if(R&&R.live){ stepRipples(); if(R.energy<R.peak*2e-3){R.live=0; R.peak=0; R.hr.fill(0); R.hi.fill(0); R.vr.fill(0); R.vi.fill(0); R.fr.fill(0);} }
+    draw();
+    raf=requestAnimationFrame(frame);
+  }
+  var visible=true;
+  function wake(){ if(still||running||document.hidden||!visible||!V||!V.rows.length) return; running=true; raf=requestAnimationFrame(frame); }
+  function sleep(){ running=false; cancelAnimationFrame(raf); }
 
   function layout(){
-    cancelAnimationFrame(simRaf); running=false;
     var vw=root.clientWidth, vh=window.innerHeight, wide=vw>880;
     lastW=vw; lastH=document.body.scrollHeight;
     var LW=lake.clientWidth, LH=lake.clientHeight, SW=shore.clientWidth, SH=shore.clientHeight;
@@ -205,108 +296,107 @@
     }
     function railFrom(y){return [[-4,y],[railX,y],[railX,bot]];}
 
-    var spans=[], shoreSegs=[], top=0, bottom=0, isle=null, tie=null, ringR=0;
+    var lakeSegs=[], shoreSegs=[], top=0, bottom=0, isle=null, ringR=0, peakScale=1;
+    me.style.width="";
     if(wide){
-      var lk=rel(links,lake), mw=me.offsetWidth, gap=14;
-      me.style.left=Math.round(Math.max(gap+16,LW*.22))+"px";
+      var lk=rel(links,lake), gap=16;
       cap.style.left=Math.round(id.l)+"px"; cap.style.top=Math.round(lk.t-36)+"px";
-      top=Math.round(id.b+74); bottom=Math.round(lk.t-36-22);
+      peakScale=clamp(LW/500,0.65,1.1)*clamp((LH-560)/340,0.45,1);
+      top=Math.round(id.b+26+102*peakScale); bottom=Math.round(lk.t-36-22);
+      var mw=me.offsetWidth;
+      if(mw>bottom-top-2*gap-24){ mw=Math.max(96,bottom-top-2*gap-24); me.style.width=mw+"px"; }
+      me.style.left=Math.round(Math.max(gap+16,LW*.2))+"px";
       var minC=Math.round(top+gap+mw/2+12), maxC=Math.round(bottom-gap-mw/2-12);
       var want=home&&hasRail?yIn:null, saved=store.get("isle"), c, aligned=false;
       if(want!==null&&want>=minC&&want<=maxC){ c=want; aligned=true; store.set("isle",{w:vw,h:vh,c:c}); }
       else if(saved&&saved.w===vw&&saved.h===vh&&saved.c>=minC&&saved.c<=maxC) c=saved.c;
-      else c=clamp(Math.round(top+(bottom-top)*.45),minC,Math.max(minC,maxC));
+      else c=clamp(Math.round(top+(bottom-top)*.48),minC,Math.max(minC,maxC));
       me.style.top=Math.round(c-mw/2)+"px";
       var m=rel(me,lake), y0=Math.round(m.cy);
-      isle={x:m.cx,y:m.cy,r:m.w/2+gap}; ringR=m.w/2+6;
-      spans=[{legs:[{a:0,b:m.l+2,y:y0}]},{legs:[{a:m.r-2,b:LW,y:y0}]}];
+      isle={x:m.cx,y:m.cy,r:m.w/2+gap}; ringR=m.w/2+7;
+      var right=[[m.r-2,y0],[LW,y0]];
       if(home&&hasRail){
         shoreSegs=[railFrom(yIn)];
-        tie={sp:spans[1],a:m.r-2,xb:Math.round(LW-30),y0:y0,lo:top+10,hi:bottom-10,yIn:yIn};
-        var e0=yIn+shore.getBoundingClientRect().top-lake.getBoundingClientRect().top;
-        tie.locked=e0>=tie.lo&&e0<=tie.hi; tie.cur=tie.locked?e0:y0;
+        if(!aligned&&yIn>=top+12&&yIn<=bottom-12){ var xb=Math.round(LW-30); right=[[m.r-2,y0],[xb,y0],[xb,yIn],[LW,yIn]]; }
       } else if(hasRail){
         if(aligned) shoreSegs=[railFrom(yIn)];
         else if(y0>=yIn&&y0<=Math.max(bot,stop)) shoreSegs=[[[-4,y0],[railX,y0]],[[railX,yIn],[railX,Math.max(bot,y0)]]];
         else shoreSegs=[railFrom(yIn)];
       }
+      lakeSegs=[[[0,y0],[m.l+2,y0]],right];
     } else {
       me.removeAttribute("style"); cap.removeAttribute("style");
       if(me.offsetWidth){
         var m2=rel(me,lake);
-        top=Math.round(rel(who,lake).b+56); bottom=Math.round(rel(links,lake).t-14);
-        isle={x:m2.cx,y:m2.cy,r:m2.w/2+10}; ringR=m2.w/2+5;
-        spans=[{legs:[{a:0,b:m2.l+2,y:Math.round(m2.cy)}]}];
+        peakScale=clamp(LW/520,0.55,0.8);
+        top=Math.round(rel(who,lake).b+20+100*peakScale); bottom=Math.round(rel(links,lake).t-14);
+        isle={x:m2.cx,y:m2.cy,r:m2.w/2+11}; ringR=m2.w/2+6;
+        lakeSegs=[[[0,Math.round(m2.cy)],[m2.l+2,Math.round(m2.cy)]]];
       }
       if(hasRail) shoreSegs=[railFrom(yIn)];
       else if(a) shoreSegs=[[[-4,Math.round(a.b+9)],[Math.round(a.l+56),Math.round(a.b+9)]]];
     }
 
-    // the drawing: the far shore, the water's surface, the island, the walkway
-    water.innerHTML=""; V={LW:LW,lines:[],spans:[],tether:tie}; W=null;
+    // compose the drawing
+    sleep(); water.innerHTML=""; V={LW:LW,rows:[]}; R=null;
     if(bottom-top>60){
-      ridge(water,LW,top-6,clamp(LW/500,0.6,1.1),wide||!isle?LW*0.98:isle.x-isle.r-4);
-      var n=clamp(Math.round((bottom-top)/30),5,13), g=node("g","lines"), r=rand(5);
+      var xmax=wide||!isle?LW*0.99:isle.x-isle.r-2;
+      mountains(water,LW,top,peakScale,xmax);
+      birds(water,LW*(wide?0.62:0.38),top-118*peakScale-6,wide?3:2,37);
+      // rows of water: crowded and fine towards the far shore, broad and heavy close to you
+      var n=clamp(Math.round((bottom-top)/21),7,20), g=node("g","lines"), r=rand(5);
       water.appendChild(g);
       for(var i=0;i<n;i++){
-        var u=i/(n-1), y=top+(bottom-top)*(0.04+0.96*Math.pow(u,1.4)), op=(0.3+0.7*u).toFixed(2);
-        var l1=node("polyline","ln"), l2=node("polyline","ln ghost");
-        l1.setAttribute("opacity",op); l1.setAttribute("stroke-dasharray",breaks(i*2+1,LW));
-        l2.setAttribute("opacity",(op*0.5).toFixed(2)); l2.setAttribute("stroke-dasharray",breaks(i*2+2,LW));
-        g.appendChild(l1); g.appendChild(l2);
-        var x0=r()<0.3?Math.round(r()*40):0, x1=Math.round(LW-(10+r()*70));
-        V.lines.push({y:y,g:0.7+1.1*u,s:(0.35+0.65*u)/(0.7+1.1*u),el:l1,el2:l2,h:hand(i*3+1,0.8),h2:hand(i*3+2,1),x0:x0,x1:x1});
+        var u=i/(n-1), y=top+14+(bottom-top-14)*(0.02+0.98*Math.pow(u,1.3));
+        var el=node("polyline","ln"), cr=node("path","crest");
+        el.setAttribute("opacity",(0.28+0.55*u).toFixed(2)); el.setAttribute("stroke-width",(0.55+0.75*u).toFixed(2));
+        cr.setAttribute("opacity",(0.22+0.38*u).toFixed(2)); cr.setAttribute("stroke-width",(0.6+0.75*u).toFixed(2));
+        g.appendChild(el); g.appendChild(cr);
+        var x0=r()<0.25?Math.round(r()*30):0, x1=Math.round(LW-(8+r()*60));
+        V.rows.push({y:y,g:0.25+1.6*u,rip:2.2,zoom:1+1.6*(1-u),th:0.42-0.12*u,el:el,cr:cr,h:hand(i*3+1,0.5+0.4*u),x0:x0,x1:x1});
       }
       if(isle){
         var cl=node("circle","clear"); cl.setAttribute("cx",isle.x); cl.setAttribute("cy",isle.y); cl.setAttribute("r",isle.r); water.appendChild(cl);
         ring(water,isle.x,isle.y,ringR);
       }
-      makeWater(LW,top-24,bottom+24,isle);
+      makeRipples(LW,top,bottom);
     }
-    var pierG=node("g","piers"); water.appendChild(pierG);
-    spans.forEach(function(sp,k){sp.band=strokes(pierG,"pier",sw,k+1); V.spans.push(sp);});
-    tether(false); draw();
+    // the walkway: moored at the shore, at the island and at the page, and steady
+    var pg=node("g","piers"); water.appendChild(pg);
+    var bands=lakeSegs.map(function(s,k){var b=strokes(pg,"pier",sw,k+1); colour(b,dense(s,6)); return b;});
+    draw();
 
     ws.innerHTML="";
-    var shoreBands=shoreSegs.map(function(s,k){
-      var b=strokes(ws,"",sw,20+k), flat=[]; s.forEach(function(q){flat.push(q[0],q[1]);});
-      // more points along the walkway, so the hand shows on long runs too
-      var dense=[]; for(var j=0;j<flat.length-2;j+=2){var x0=flat[j],y0=flat[j+1],x1=flat[j+2],y1=flat[j+3],
-        L=Math.abs(x1-x0)+Math.abs(y1-y0), m=Math.max(1,Math.ceil(L/12));
-        for(var t=0;t<m;t++) dense.push(x0+(x1-x0)*t/m, y0+(y1-y0)*t/m);}
-      dense.push(flat[flat.length-2],flat[flat.length-1]);
-      colour(b,dense); return b;
-    });
+    var shoreBands=shoreSegs.map(function(s,k){var b=strokes(ws,"",sw,20+k); colour(b,dense(s,12)); return b;});
 
     if(drawIn){
       var t=350;
-      V.spans.forEach(function(sp){sp.band.forEach(function(s){lay(s.el,t);}); sp.at=t; t+=spanLen(sp)/1.1;});
+      bands.forEach(function(b,k){b.forEach(function(s){lay(s.el,t);}); t+=plen(lakeSegs[k])/1.1;});
       shoreBands.forEach(function(b,k){b.forEach(function(s){lay(s.el,t);}); t+=plen(shoreSegs[k])/1.1;});
       water.getBoundingClientRect(); ws.getBoundingClientRect();
-      V.spans.forEach(function(sp){sp.band.forEach(function(s){s.el.style.strokeDashoffset=0;});});
-      shoreBands.forEach(function(b){b.forEach(function(s){s.el.style.strokeDashoffset=0;});});
-      // laying the walkway on the water sets it rocking, once
-      if(isle&&V.spans.length) setTimeout(function(){
-        poke(isle.x-isle.r-10,isle.y,14); poke(isle.x+isle.r+10,isle.y,14);
-      }, V.spans[0].at+spanLen(V.spans[0])/1.1);
+      bands.concat(shoreBands).forEach(function(b){b.forEach(function(s){s.el.style.strokeDashoffset=0;});});
       visit.set("walked",1); drawIn=false;
     }
     lake.classList.add("ready");
+    wake();
   }
 
-  // the water answers the pointer: faster moves leave a bigger wake
-  var last=null;
+  // the water answers the pointer: a sweep leaves a wake, a tap drops a stone
+  var last=null, lastDrop=0;
   function local(e){var r=lake.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top,t:e.timeStamp};}
+  function onWater(q){return R&&V&&V.rows.length&&q.y>V.rows[0].y-6&&q.y<V.rows[V.rows.length-1].y+10;}
   lake.addEventListener("pointermove",function(e){
-    if(!W) return; var q=local(e);
-    if(q.y<W.top+20||q.y>W.top+(W.ny-1)*W.cs-20){last=null;return;}
-    if(last){var dt=Math.max(8,q.t-last.t), v=Math.sqrt((q.x-last.x)*(q.x-last.x)+(q.y-last.y)*(q.y-last.y))/dt;
-      if(v>0.05) poke(q.x,q.y,Math.min(6,v*4.5));}
+    var q=local(e); if(!onWater(q)){last=null;return;}
+    if(last&&q.t-lastDrop>28){
+      var dt=Math.max(8,q.t-last.t), v=Math.sqrt((q.x-last.x)*(q.x-last.x)+(q.y-last.y)*(q.y-last.y))/dt;
+      if(v>0.05){ drop(q.x,q.y,-Math.min(2.6,v*1.8),8); lastDrop=q.t; }
+    }
     last=q;
   });
   lake.addEventListener("pointerleave",function(){last=null;});
-  lake.addEventListener("pointerdown",function(e){if(!W) return; var q=local(e); poke(q.x,q.y,24);});
-  document.addEventListener("visibilitychange",function(){if(document.hidden){cancelAnimationFrame(simRaf); running=false;}});
+  lake.addEventListener("pointerdown",function(e){var q=local(e); if(onWater(q)) drop(q.x,q.y,-10,12);});
+  document.addEventListener("visibilitychange",function(){ if(document.hidden) sleep(); else wake(); });
+  if("IntersectionObserver" in window) new IntersectionObserver(function(es){ visible=es[0].isIntersecting; if(visible) wake(); else sleep(); }).observe(lake);
 
   function schedule(){
     if(root.clientWidth===lastW&&document.body.scrollHeight===lastH) return;
@@ -316,7 +406,6 @@
   function start(){
     layout();
     window.addEventListener("resize",schedule);
-    window.addEventListener("scroll",function(){ if(V&&V.tether) requestTether(); },{passive:true});
     if("ResizeObserver" in window) new ResizeObserver(schedule).observe(document.body);
     [].forEach.call(document.querySelectorAll("details"),function(d){d.addEventListener("toggle",now);});
   }

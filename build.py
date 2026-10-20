@@ -351,7 +351,7 @@ def lake(is_home):
     {name}
     <p class="who" id="who"><b>{C.SITE["title"]}</b>{C.SITE["interests"]}</p>
   </div>
-  <img class="me" id="me" src="/assets/img/me.jpg" width="200" height="200" alt="Portrait of {esc(ME)}">
+  <img class="me" id="me" src="/assets/img/me.jpg" width="640" height="640" alt="Portrait of {esc(ME)}">
   <p class="map" id="lbl-lake" aria-hidden="true">Lago d’Iseo, simulated</p>
   <nav class="links" id="links" aria-label="Contact and profiles">
     {links}

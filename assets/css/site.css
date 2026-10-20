@@ -42,10 +42,11 @@ p{margin:0}
 .lake{position:sticky;top:0;height:100vh;height:100dvh;overflow:hidden;background:var(--paper);color:var(--ink);
   padding:clamp(2.2rem,6vh,3.6rem) clamp(1.6rem,3vw,2.8rem);touch-action:pan-y}
 .water{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.water .ln{fill:none;stroke:var(--graphite);stroke-width:1.05;stroke-linecap:round}
-.water .ln.ghost{stroke-width:.7}
-.water .ink{fill:none;stroke:var(--ink);stroke-width:1.25;stroke-linecap:round;stroke-linejoin:round}
-.water .ink.ghost{stroke-width:.75;opacity:.45}
+.water .ln{fill:none;stroke:var(--graphite);stroke-linecap:round;stroke-linejoin:round}
+.water .crest{fill:none;stroke:var(--ink);stroke-linecap:round;stroke-linejoin:round}
+.water .ink{fill:none;stroke:var(--ink);stroke-linecap:round;stroke-linejoin:round}
+.water .hatch{stroke:var(--graphite);stroke-width:.8;stroke-linecap:round}
+.water .tree{fill:none;stroke:var(--ink);stroke-width:.85;stroke-linecap:round;stroke-linejoin:round;opacity:.72}
 .water .clear{fill:var(--paper)}
 .water .pier,.walk polyline{fill:none;stroke:var(--pier);stroke-linejoin:round;stroke-linecap:round}
 .lake .id,.lake .links{position:relative;z-index:2}
@@ -54,8 +55,8 @@ p{margin:0}
 .name span{display:block}
 .who{margin-top:1.15rem;max-width:22rem;font-size:.98rem;line-height:1.5;color:var(--soft)}
 .who b{display:block;color:var(--ink);font-weight:600}
-.me{position:absolute;z-index:2;left:22%;top:50%;width:clamp(6.5rem,9.5vw,9rem);height:auto;aspect-ratio:1;object-fit:cover;
-  border-radius:50%;border:3px solid var(--paper);filter:grayscale(1) contrast(1.08)}
+.me{position:absolute;z-index:2;left:20%;top:52%;width:clamp(9rem,14vw,13rem);height:auto;aspect-ratio:1;object-fit:cover;
+  border-radius:50%;border:4px solid var(--paper)}
 .map{position:absolute;z-index:2;margin:0;font-family:"Caveat","Archivo",cursive;font-size:1.15rem;line-height:1;color:var(--soft);white-space:nowrap;pointer-events:none}
 .links{position:absolute!important;left:clamp(1.6rem,3vw,2.8rem);right:clamp(1.2rem,2vw,2rem);bottom:clamp(1.8rem,5vh,3rem);
   display:flex;flex-wrap:wrap;column-gap:clamp(.7rem,1vw,1rem);row-gap:.35rem;font-size:.9rem;font-weight:600}
@@ -199,7 +200,7 @@ footer.foot i{color:var(--ink)}
   .frame{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
   .lake{position:relative;height:auto;padding:2.6rem 1.25rem 2rem}
   .shore{flex:1 0 auto;min-height:0}
-  .me{position:relative;display:block;left:auto;top:auto;margin:3.2rem 1.6rem 2rem auto;width:6.5rem}
+  .me{position:relative;display:block;left:auto;top:auto;margin:4.6rem 1.2rem 2.2rem auto;width:8.5rem}
   .map{display:none}
   .links{position:relative!important;left:auto;right:auto;bottom:auto;margin-top:.6rem}
   :root{--side:1.25rem}
