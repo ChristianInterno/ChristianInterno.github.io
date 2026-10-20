@@ -52,6 +52,10 @@ and shows up at christianinterno.com/GeoPhys/ by itself.
 
 ## Small things
 
+- **Search engines**: while `"listed": False` in content.py, every page carries `noindex` and there is no sitemap,
+  so search engines leave the site out (anyone with the link can still open it). When it's ready, set it to `True`,
+  rebuild and push; then add the site in Google Search Console to have it picked up quickly.
+
 - **CV**: save a PDF as `assets/cv.pdf` and rebuild; a "CV" item appears in the menu.
 - **Photo**: `assets/img/me.jpg` is 200×200. A square photo of 600×600 or more, under the same name, looks sharper.
 - **Colours**: black and white, with the walkway as the only colour: `--paper`, `--ink`, `--graphite` (the pencil lines) and `--pier` (the orange). Dark mode swaps paper and ink, like chalk on a blackboard. The name and the caption under the lake are set in Caveat, to read like handwriting on the drawing.

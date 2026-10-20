@@ -24,6 +24,7 @@ UPDATED = TODAY.strftime("%B %Y")
 URL = C.SITE["url"].rstrip("/")
 ME = C.SITE["name"]
 HAS_CV = os.path.exists(os.path.join(ROOT, C.SITE["cv"]))
+LISTED = C.SITE.get("listed", True)
 
 # (folder, menu label, <title>, meta description)
 PAGES = [
@@ -306,7 +307,7 @@ FIGURES = {"bounce": figure_bounce, "islands": figure_islands}
 
 def head(path, title, desc, noindex=False, extra=""):
     url = URL + "/" + path
-    robots = '<meta name="robots" content="noindex">\n' if noindex else ""
+    robots = '<meta name="robots" content="noindex, nofollow">\n' if noindex or not LISTED else ""
     canon = "" if noindex else f'<link rel="canonical" href="{url}">\n'
     return f"""<!doctype html>
 <html lang="en">
@@ -622,13 +623,19 @@ def main():
     write("mentoring/index.html", page("mentoring/", mentoring()))
     write("404.html", page("404", not_found(), title=f"Not found · {ME}",
                            desc="There’s nothing at this address.", noindex=True))
-    urls = "".join(f"  <url><loc>{URL}/{p}</loc><lastmod>{TODAY.isoformat()}</lastmod></url>\n" for p, *_ in PAGES)
-    write("sitemap.xml", '<?xml version="1.0" encoding="UTF-8"?>\n'
-          '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + "</urlset>\n")
-    write("robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {URL}/sitemap.xml\n")
+    if LISTED:
+        urls = "".join(f"  <url><loc>{URL}/{p}</loc><lastmod>{TODAY.isoformat()}</lastmod></url>\n" for p, *_ in PAGES)
+        write("sitemap.xml", '<?xml version="1.0" encoding="UTF-8"?>\n'
+              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + urls + "</urlset>\n")
+        write("robots.txt", f"User-agent: *\nAllow: /\n\nSitemap: {URL}/sitemap.xml\n")
+    else:
+        # crawlers may still visit, so they can read the "noindex" on every page; there is no sitemap to offer
+        if os.path.exists(os.path.join(ROOT, "sitemap.xml")):
+            os.remove(os.path.join(ROOT, "sitemap.xml"))
+        write("robots.txt", "User-agent: *\nAllow: /\n")
     write("CNAME", URL.split("://", 1)[1] + "\n")
     write(".nojekyll", "")
-    print("Built", len(PAGES), "pages + 404" + (" (with CV)" if HAS_CV else "") + ".")
+    print("Built", len(PAGES), "pages + 404" + (" (with CV)" if HAS_CV else "") + ("" if LISTED else ", hidden from search engines") + ".")
 
 
 if __name__ == "__main__":

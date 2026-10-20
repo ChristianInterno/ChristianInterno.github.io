@@ -10,6 +10,9 @@ Authors: write full names; add a trailing * for equal contribution.
 SITE = {
     "name": "Christian Internò",
     "url": "https://christianinterno.com",
+    # While this is False, every page asks search engines not to list it (people with the link can still visit).
+    # Set it to True when the site is ready, rebuild, and push.
+    "listed": False,
     "title": "Researcher, Bielefeld University",
     "interests": "World models, physical reasoning and distributed learning.",
     "tagline": "I study how neural networks model the physical world, and how they learn together.",
