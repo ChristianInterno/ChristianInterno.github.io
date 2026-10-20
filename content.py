@@ -35,37 +35,40 @@ BIO = [
     'I am a researcher at Bielefeld University, working with <a href="https://hammer-lab.techfak.uni-bielefeld.de/">Barbara Hammer</a>; '
     'my PhD is funded by the <a href="https://www.honda-ri.de/">Honda Research Institute Europe</a>. After a Visiting Fellowship in '
     'Philip Torr’s <a href="https://torrvision.com/">Torr Vision Group</a> at the <a href="https://www.ox.ac.uk/">University of Oxford</a>, '
-    'I continue to work with the group on world models for video. Recently, <a href="/GeoPhys/">GeoPhys</a> took first place on both '
-    '<a href="https://github.com/google-deepmind/physics-IQ-benchmark">Physics&#8209;IQ</a> video-to-video leaderboards, and two of my '
-    'papers were accepted at NeurIPS 2026. I review for NeurIPS, ICML and IJCNN, and have '
-    '<a href="/mentoring/">mentored master’s students</a> at the Honda Research Institute.',
+    'I continue to work with the group on world models.',
     'My <a href="/research/">research</a> focuses on world models and physical reasoning: I read the geometry of learned '
     'representations to find out what neural networks know about physics, and use it to tell whether a generated video could '
     'really happen. Broadly, I want physical plausibility to become something we can measure: principled ways to read physics '
-    'out of a model without changing it, and to put that structure to work as a prior for learning, a verifier at inference time '
-    'and a diagnostic for anomalies.',
-    'Alongside this, I work on distributed learning, where many models learn together without sharing their data; that line '
-    'includes an oral at the NeurIPS 2024 workshop on federated foundation models. I have been a visiting researcher at '
-    '<a href="https://www.cshl.edu/">Cold Spring Harbor Laboratory</a> and Leiden University, and I studied data science at the '
-    'University of Milano-Bicocca. Off the clock, you’ll find me surfing, at the cinema or at a concert.',
+    'out of a model, and to put that structure to work as a prior for learning, a verifier at inference time and a diagnostic '
+    'for anomalies. Alongside this, I work on distributed learning, where many models learn together without sharing their data.',
+    'I have been a visiting researcher at <a href="https://www.cshl.edu/">Cold Spring Harbor Laboratory</a> and Leiden University, '
+    'and I studied data science at the University of Milano-Bicocca.',
 ]
 
 # Newest first. The first `NEWS_SHOWN` items are visible; the rest fold under "Earlier news".
 # Set "next": True for something that hasn't happened yet.
-NEWS_SHOWN = 6
+NEWS_SHOWN = 7
 NEWS = [
     {"date": "Dec 2026", "next": True, "text": "<b>Next:</b> NeurIPS 2026 in Sydney."},
     {"date": "Oct 2026", "text": '<a href="https://arxiv.org/abs/2610.22655"><i>Is a Linear Probe Evidence of a Linear Representation?</i></a> is on arXiv.'},
-    {"date": "Oct 2026", "text": 'Released the <a href="https://huggingface.co/datasets/CInterno/GeoPhys-features">GeoPhys feature dataset</a> on Hugging Face.'},
-    {"date": "Sep 2026", "text": "<b>Two papers accepted at NeurIPS 2026:</b> GeoPhys, and the linear probe paper as joint first author."},
+    {"date": "Oct 2026", "text": 'Released the GeoPhys <a href="https://github.com/ChristianInterno/GeoPhys">code on GitHub</a> and the '
+                                 '<a href="https://huggingface.co/datasets/CInterno/GeoPhys-features">feature dataset</a> on Hugging Face.'},
+    {"date": "Sep 2026", "text": '<b>Two papers accepted at NeurIPS 2026:</b> <a href="https://arxiv.org/abs/2606.20707">GeoPhys</a>, and '
+                                 '<a href="https://arxiv.org/abs/2610.22655"><i>Is a Linear Probe Evidence of a Linear Representation?</i></a> '
+                                 'as joint first author.'},
     {"date": "Sep 2026", "text": 'Two new preprints: <a href="https://arxiv.org/abs/2609.37631">Procedural Core</a> and <a href="https://arxiv.org/abs/2609.23881">MotionJEPA</a>.'},
+    {"date": "Jul 2026", "text": '<a href="https://doi.org/10.1109/JIOT.2026.3686028"><i>Pruning Federated Models Through Loss Landscape '
+                                 'Analysis and Client Agreement Scoring</i></a> is out in the <b>IEEE Internet of Things Journal</b>.'},
     {"date": "Jun 2026", "text": '<b>GeoPhys reached first place</b> in video-to-video generation on both <a href="https://github.com/google-deepmind/physics-IQ-benchmark">Physics&#8209;IQ leaderboards</a>.'},
     {"date": "Jun 2026", "text": "Started a Visiting Fellowship in Philip Torr’s group at the University of Oxford."},
     {"date": "Jun 2026", "text": "<i>Geodesic-SVDD Latent Mixup for One-Shot Distributed Tabular Learning</i> at IJCNN 2026 in Maastricht."},
     {"date": "Feb 2026", "text": '<a href="https://arxiv.org/abs/2602.12218">The Observer Effect in World Models</a> is on arXiv.'},
     {"date": "Jan 2026", "text": "PPFLex at the AAAI 2026 workshop on federated learning for critical applications."},
-    {"date": "Dec 2025", "text": "At NeurIPS 2025 in San Diego with ReStraV, and the Narcissus Hypothesis at a workshop."},
-    {"date": "Dec 2024", "text": "Oral at the NeurIPS 2024 International Workshop on Federated Foundation Models."},
+    {"date": "Dec 2025", "text": 'At NeurIPS 2025 in San Diego with <a href="https://arxiv.org/abs/2507.00583">ReStraV</a>, and '
+                                 '<a href="https://arxiv.org/abs/2509.17999">the Narcissus Hypothesis</a> at a workshop.'},
+    {"date": "Dec 2024", "text": 'Oral at the <a href="https://neurips.cc/virtual/2024/workshop/84740">NeurIPS 2024 International Workshop '
+                                 'on Federated Foundation Models</a>, on <a href="https://arxiv.org/abs/2405.10271">adaptive hybrid pruning '
+                                 'in federated learning</a>.'},
 ]
 
 # The two lines of work. Papers, research themes and the publications filter use these keys.

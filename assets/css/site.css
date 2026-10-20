@@ -59,7 +59,12 @@ p{margin:0}
   border-radius:50%;border:4px solid var(--paper)}
 .map{position:absolute;z-index:2;margin:0;font-family:"Caveat","Archivo",cursive;font-size:1.15rem;line-height:1;color:var(--soft);white-space:nowrap;pointer-events:none}
 .links{position:absolute!important;left:clamp(1.6rem,3vw,2.8rem);right:clamp(1.2rem,2vw,2rem);bottom:clamp(1.8rem,5vh,3rem);
-  display:flex;flex-wrap:wrap;column-gap:clamp(.7rem,1vw,1rem);row-gap:.35rem;font-size:.9rem;font-weight:600}
+  display:flex;flex-wrap:wrap;column-gap:clamp(.8rem,1.2vw,1.15rem);row-gap:.45rem;font-size:.88rem;font-weight:600}
+.links a{display:inline-flex;align-items:center;gap:.36rem;text-decoration:none}
+.links a span{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.22em;text-decoration-color:color-mix(in srgb,currentColor 35%,transparent)}
+.links a:hover span{text-decoration-color:var(--pier);text-decoration-thickness:2px}
+.ico{width:1.05em;height:1.05em;flex:none;fill:currentColor}
+.ico.line{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round}
 /* the island and its caption surface once the drawing knows where they are */
 .me,.map{transition:opacity .45s ease}
 .js .lake:not(.ready) .me,.js .lake:not(.ready) .map{opacity:0}
@@ -107,6 +112,15 @@ summary{cursor:pointer;color:var(--soft);font-size:.9rem;text-decoration:underli
 summary::-webkit-details-marker{display:none}
 summary:hover{text-decoration-color:var(--pier);text-decoration-thickness:2px}
 details.earlier[open] > summary{display:none}
+
+/* the two lines of work, on the About page */
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2.2rem}
+.card figure{margin:0 0 .9rem}
+.card h3{margin:0 0 .45rem;font-size:1.05rem;line-height:1.3;text-wrap:balance}
+.card h3 a{text-decoration:none}
+.card h3 a:hover{text-decoration:underline;text-decoration-color:var(--pier)}
+.card p{font-size:.95rem;line-height:1.6;text-wrap:pretty}
+.card .more{margin-top:.6rem}
 
 /* talks */
 .talks li + li{margin-top:1.2rem}
@@ -206,6 +220,8 @@ footer.foot i{color:var(--ink)}
   :root{--side:1.25rem}
   .shore{padding-top:1.4rem}
   .theme{grid-template-columns:minmax(0,1fr);row-gap:1.4rem}
+  .cards{grid-template-columns:minmax(0,1fr)}
+  .card figure{max-width:22rem}
   .theme figure{max-width:22rem}
   /* inner pages: the band shrinks to a name, so the page starts right away */
   body.sub .lake{padding:1.5rem 1.25rem 1.35rem}
