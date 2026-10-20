@@ -1,113 +1,106 @@
-/* christianinterno.com — the lake and the shore */
+/* christianinterno.com — Lago d'Iseo, simulated */
 
 :root{
-  --deep:#1A555C;      /* the lake */
-  --shallow:#226770;   /* water around the islands */
-  --glint:#276C74;     /* ripples */
-  --foam:#F3F0E6;      /* light on water */
-  --foam-soft:#B9D1CD;
-  --mist:#E3ECE9;      /* morning haze over the shore */
-  --mist-2:#D7E3DF;    /* a step deeper, for code blocks */
-  --ink:#0E2F34;
-  --soft:#46636A;
-  --pier:#F4A30C;      /* dahlia yellow, after The Floating Piers */
-  --pier-side:#D7700E; /* the fabric where it folds into the water */
-  --isle:#2F5D49;      /* Monte Isola */
-  --shore:#E9E3D2;     /* pebbles */
-  --night:#123E44;
-  --tag:#1A555C;
+  --shore:#F5F7F6;     /* the page: lakeside light */
+  --lake:#E1E9EB;      /* still water on a hazy morning */
+  --lake-2:#D2DEE1;    /* a shade deeper: shallows, code */
+  --line:#86A2AB;      /* the surface, drawn */
+  --ink:#12262D;       /* deep water */
+  --soft:#52666D;
+  --pier:#F2A30F;      /* dahlia yellow, after The Floating Piers */
+  --isle:#6B8775;      /* the woods on Monte Isola */
   --gutter:6.6rem;
   --gap:1.1rem;
   --side:clamp(1.4rem,4vw,4.2rem);
 }
 @media (prefers-color-scheme:dark){
   :root{
-    --deep:#0E3439;--shallow:#134047;--glint:#1A4A51;
-    --mist:#0B1B1E;--mist-2:#12282C;--ink:#DCE7E4;--soft:#93AEAA;
-    --isle:#3B6B55;--shore:#33504B;--night:#071416;--tag:#1E5058;
+    --shore:#0B171B;--lake:#10242B;--lake-2:#16303A;--line:#3F6676;
+    --ink:#DCE6E8;--soft:#93A9AF;--isle:#55705F;
   }
 }
 
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{
-  margin:0;background:var(--mist);color:var(--ink);
-  font-family:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:1.03125rem;line-height:1.55;
+  margin:0;background:var(--shore);color:var(--ink);
+  font-family:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;font-size:1.03125rem;line-height:1.6;
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
 }
-::selection{background:var(--pier);color:#0E2F34}
-a{color:inherit;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:.2em;text-decoration-color:color-mix(in srgb,currentColor 35%,transparent)}
-a:hover{text-decoration-color:var(--pier)}
-a:focus-visible,summary:focus-visible,button:focus-visible{outline:3px solid var(--pier);outline-offset:3px}
+::selection{background:var(--pier);color:#12262D}
+a{color:inherit;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.22em;text-decoration-color:color-mix(in srgb,currentColor 40%,transparent)}
+a:hover{text-decoration-color:var(--pier);text-decoration-thickness:2px}
+a:focus-visible,summary:focus-visible,button:focus-visible{outline:2px solid var(--pier);outline-offset:3px}
 p{margin:0}
-.skip{position:absolute;left:-999px;top:0;z-index:10;background:var(--pier);color:#0E2F34;padding:.5rem .8rem;font-weight:700}
+.skip{position:absolute;left:-999px;top:0;z-index:10;background:var(--pier);color:#12262D;padding:.5rem .8rem;font-weight:600}
 .skip:focus{left:.5rem;top:.5rem}
 
 .frame{display:grid;grid-template-columns:clamp(330px,36vw,540px) minmax(0,1fr)}
 
 /* ---------- the lake: stays beside you while you read ---------- */
-.lake{position:sticky;top:0;height:100vh;height:100dvh;overflow:hidden;background:var(--deep);color:var(--foam);padding:clamp(2.2rem,6vh,3.6rem) clamp(1.6rem,3vw,2.8rem)}
-.lake svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
-.ripples line{stroke:var(--glint);stroke-width:2;stroke-linecap:round}
-.walk polyline{fill:none;stroke-linejoin:miter;stroke-linecap:butt}
-.walk .side{stroke:var(--pier-side)}
-.walk .top{stroke:var(--pier)}
+.lake{position:sticky;top:0;height:100vh;height:100dvh;overflow:hidden;background:var(--lake);color:var(--ink);
+  padding:clamp(2.2rem,6vh,3.6rem) clamp(1.6rem,3vw,2.8rem);touch-action:pan-y}
+.water{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.water .ln{fill:none;stroke:var(--line);stroke-width:1}
+.water .clear{fill:var(--lake)}
+.water .pier,.walk polyline{fill:none;stroke:var(--pier);stroke-linejoin:round;stroke-linecap:butt}
 .lake .id,.lake .links{position:relative;z-index:2}
-.name{margin:0;font-weight:800;font-stretch:112%;font-size:clamp(2.7rem,4.6vw,4.6rem);line-height:.88;letter-spacing:-.04em}
+.name{margin:0;font-weight:600;font-stretch:116%;font-size:clamp(2.5rem,4.2vw,4rem);line-height:.92;letter-spacing:-.035em}
 .name a{text-decoration:none;color:inherit}
 .name span{display:block}
-.who{margin-top:1.1rem;max-width:23rem;font-size:1rem;line-height:1.45;font-weight:500;color:var(--foam-soft)}
-.who b{display:block;color:var(--foam);font-weight:600}
-.isle{position:absolute;z-index:2;border-radius:50%;box-shadow:0 0 0 .45rem var(--shore),0 0 0 1.4rem var(--shallow)}
-.me{width:clamp(7rem,10vw,9.5rem);height:auto;aspect-ratio:1;object-fit:cover;left:20%;top:47%}
-.islet{width:3.8rem;height:2.7rem;background:var(--isle);border-radius:58% 42% 55% 45% / 52% 60% 40% 48%}
-.map{position:absolute;z-index:2;margin:0;font-style:italic;font-weight:400;font-size:.76rem;letter-spacing:.32em;color:var(--foam-soft);opacity:.75;white-space:nowrap;pointer-events:none}
-.links{position:absolute!important;left:clamp(1.6rem,3vw,2.8rem);right:clamp(1.2rem,2vw,2rem);bottom:clamp(1.8rem,5vh,3rem);display:flex;flex-wrap:wrap;column-gap:clamp(.7rem,1vw,1rem);row-gap:.35rem;font-size:.9rem;font-weight:600}
-.links a{color:var(--foam)}
-/* the islands surface once the walkway knows where they are */
-.me,.islet,.map{transition:opacity .45s ease}
-.js .lake:not(.ready) .me,.js .lake:not(.ready) .islet,.js .lake:not(.ready) .map{opacity:0}
+.who{margin-top:1.15rem;max-width:22rem;font-size:.98rem;line-height:1.5;color:var(--soft)}
+.who b{display:block;color:var(--ink);font-weight:600}
+.me{position:absolute;z-index:2;left:22%;top:50%;width:clamp(6.5rem,9.5vw,9rem);height:auto;aspect-ratio:1;object-fit:cover;
+  border-radius:50%;border:3px solid var(--shore)}
+.map{position:absolute;z-index:2;margin:0;font-style:italic;font-size:.8rem;color:var(--soft);white-space:nowrap;pointer-events:none}
+.links{position:absolute!important;left:clamp(1.6rem,3vw,2.8rem);right:clamp(1.2rem,2vw,2rem);bottom:clamp(1.8rem,5vh,3rem);
+  display:flex;flex-wrap:wrap;column-gap:clamp(.7rem,1vw,1rem);row-gap:.35rem;font-size:.9rem;font-weight:600}
+/* the island and its caption surface once the water knows where they are */
+.me,.map{transition:opacity .45s ease}
+.js .lake:not(.ready) .me,.js .lake:not(.ready) .map{opacity:0}
 
 /* ---------- the shore: everything to read ---------- */
-.shore{position:relative;min-width:0;display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;padding:clamp(1.6rem,4vh,2.4rem) var(--side) 0}
+.shore{position:relative;min-width:0;display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;
+  padding:clamp(1.6rem,4vh,2.4rem) var(--side) 0}
 #content{flex:1 0 auto}
 .shore > svg{position:absolute;left:0;top:0;z-index:0;pointer-events:none;overflow:visible}
 .shore > nav,.shore section,.shore footer,.shore .pagehead{position:relative;z-index:1}
 .col{max-width:46rem}
 
-.menu{display:flex;flex-wrap:wrap;column-gap:1.35rem;row-gap:.3rem;margin:0 0 clamp(2rem,5vh,3rem);font-size:.95rem;font-weight:600}
+.menu{display:flex;flex-wrap:wrap;column-gap:1.35rem;row-gap:.3rem;margin:0 0 clamp(2rem,5vh,3rem);font-size:.95rem;font-weight:550}
 .menu a{text-decoration:none;color:var(--soft);padding:.15rem 0}
 .menu a:hover{color:var(--ink)}
 .menu a[aria-current="page"]{color:var(--ink);box-shadow:inset 0 -3px 0 var(--pier)}
 
-h1.title{margin:0 0 1.4rem;font-weight:800;font-stretch:112%;font-size:clamp(2rem,3.4vw,2.6rem);line-height:1.02;letter-spacing:-.03em}
+h1.title{margin:0 0 1.4rem;font-weight:650;font-stretch:108%;font-size:clamp(2rem,3.2vw,2.5rem);line-height:1.05;letter-spacing:-.025em}
 .pagehead{max-width:46rem;margin-bottom:3.2rem}
 .pagehead p{max-width:40rem;color:var(--soft);font-size:1.02rem;text-wrap:pretty}
 .pagehead.tight{margin-bottom:0}
-h2{margin:0 0 1.3rem;font-weight:800;font-stretch:112%;font-size:1.5rem;line-height:1.1;letter-spacing:-.02em}
-h3{margin:0 0 .8rem;font-weight:700;font-stretch:108%;font-size:1.1rem;line-height:1.25}
+h2{margin:0 0 1.3rem;font-weight:650;font-stretch:106%;font-size:1.35rem;line-height:1.15;letter-spacing:-.015em}
+h3{margin:0 0 .8rem;font-weight:600;font-size:1.05rem;line-height:1.3}
 section + section{margin-top:3.6rem}
-.bio p{font-size:1.06rem;line-height:1.6;text-wrap:pretty}
+.bio p{font-size:1.06rem;line-height:1.65;text-wrap:pretty}
 .bio p + p{margin-top:.85rem}
-.bio .lead{font-size:1.2rem;line-height:1.45;font-weight:500;letter-spacing:-.004em}
-.more{margin-top:1.4rem;font-size:.95rem;font-weight:600}
+.bio .lead{font-size:1.24rem;line-height:1.45;font-weight:500;letter-spacing:-.006em}
+.more{margin-top:1.3rem;font-size:.93rem;font-weight:600}
 .prose{font-size:.97rem;text-wrap:pretty}
 
-/* left gutter: dates, venues, years and labels all hang here */
+/* left gutter: dates, venues and years hang here */
 .row{display:grid;grid-template-columns:var(--gutter) minmax(0,1fr);column-gap:var(--gap);align-items:baseline}
 .feed,.pubs,.plain,.codes{list-style:none;margin:0;padding:0}
 .feed li + li{margin-top:1rem}
-.date{justify-self:start;padding:.2rem .55rem .22rem;background:var(--pier);color:#0E2F34;font-size:.8rem;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;box-shadow:3px 3px 0 var(--pier-side)}
-.date.next{background:var(--mist);color:var(--ink);box-shadow:inset 0 0 0 2px var(--pier),3px 3px 0 var(--pier-side)}
+.date{justify-self:start;padding:.17rem .5rem .19rem;background:var(--pier);color:#12262D;font-size:.78rem;font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap}
+.date.next{background:var(--shore);color:var(--ink);box-shadow:inset 0 0 0 2px var(--pier)}
 .feed p{font-size:.97rem;text-wrap:pretty}
 .feed b{font-weight:600}
 .where{color:var(--soft)}
 details.earlier{margin-top:1rem}
 details.earlier > summary{display:inline-block;margin-left:calc(var(--gutter) + var(--gap))}
 details.earlier .feed{margin-top:1rem}
-summary{cursor:pointer;color:var(--soft);font-size:.9rem;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:.2em;text-decoration-color:color-mix(in srgb,currentColor 35%,transparent);list-style:none}
+summary{cursor:pointer;color:var(--soft);font-size:.9rem;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.22em;text-decoration-color:color-mix(in srgb,currentColor 40%,transparent);list-style:none}
 summary::-webkit-details-marker{display:none}
-summary:hover{text-decoration-color:var(--pier)}
+summary:hover{text-decoration-color:var(--pier);text-decoration-thickness:2px}
 details.earlier[open] > summary{display:none}
 
 /* talks */
@@ -116,30 +109,36 @@ details.earlier[open] > summary{display:none}
 .talks .where{margin-top:.1rem;font-size:.86rem}
 
 /* papers */
-.badge{justify-self:start;padding:.2rem .5rem .22rem;background:var(--tag);color:var(--foam);font-size:.74rem;font-weight:700;letter-spacing:.01em;white-space:nowrap;line-height:1.3}
-.badge.pre{background:transparent;color:var(--soft);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--soft) 55%,transparent)}
-.pubs li + li{margin-top:1.3rem}
+.badge{justify-self:start;font-size:.8rem;font-weight:600;line-height:1.4;white-space:nowrap;color:var(--ink)}
+.badge.pre{color:var(--soft);font-weight:500}
+.pubs li + li{margin-top:1.35rem}
 .pubs li{scroll-margin-top:1.5rem}
-.pubs li:target .t{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--pier) 70%,transparent);text-decoration-thickness:.42em;text-underline-offset:-.18em;text-decoration-skip-ink:none}
-.t{font-weight:600;line-height:1.35;text-wrap:balance}
-.au{margin-top:.2rem;font-size:.84rem;line-height:1.5;color:var(--soft)}
+.pubs li:target .t{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--pier) 75%,transparent);text-decoration-thickness:.4em;text-underline-offset:-.16em;text-decoration-skip-ink:none}
+h3.group{margin:2rem 0 1rem;font-size:.95rem;font-weight:600;color:var(--soft)}
+h3.group:first-of-type{margin-top:0}
+.t{font-weight:600;line-height:1.38;text-wrap:balance}
+.au{margin-top:.2rem;font-size:.85rem;line-height:1.5;color:var(--soft)}
 .au b{font-weight:600;color:var(--ink)}
-.meta{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.85rem;row-gap:.1rem;margin-top:.1rem;font-size:.84rem;color:var(--soft)}
+.meta{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.85rem;row-gap:.1rem;margin-top:.15rem;font-size:.85rem;color:var(--soft)}
 .meta .venue{color:var(--ink);font-style:italic}
-.bibtoggle{padding:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:.2em;text-decoration-color:color-mix(in srgb,currentColor 35%,transparent)}
-.bibtoggle:hover{text-decoration-color:var(--pier)}
+.bibtoggle{padding:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.22em;text-decoration-color:color-mix(in srgb,currentColor 40%,transparent)}
+.bibtoggle:hover{text-decoration-color:var(--pier);text-decoration-thickness:2px}
 .bibtoggle[aria-expanded="true"]{color:var(--ink)}
-.flag{margin-top:.3rem;font-size:.84rem;font-weight:600}
-.flag::before,.qs li::before{content:"";display:inline-block;width:.58rem;height:.58rem;margin-right:.5rem;background:var(--pier);box-shadow:2px 2px 0 var(--pier-side);vertical-align:.02em}
+.flag{margin-top:.3rem;font-size:.85rem;font-weight:600}
+.flag::before,.qs li::before{content:"";display:inline-block;width:.5rem;height:.5rem;margin-right:.5rem;background:var(--pier);vertical-align:.05em}
 .bibbox{position:relative;margin-top:.6rem}
-.bibbox[hidden]{display:none}
-.bibbox pre{margin:0;padding:.9rem 1rem;background:var(--mist-2);color:var(--ink);font:.76rem/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:auto;white-space:pre}
-.copy{position:absolute;top:.45rem;right:.45rem;padding:.2rem .55rem;border:0;background:var(--tag);color:var(--foam);font:600 .74rem/1.4 "Archivo",sans-serif;cursor:pointer}
-.note{margin-top:1.3rem;font-size:.84rem;color:var(--soft)}
+.bibbox pre{margin:0;padding:.9rem 1rem;background:var(--lake);color:var(--ink);font:.76rem/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;overflow-x:auto;white-space:pre}
+.copy{position:absolute;top:.45rem;right:.45rem;padding:.2rem .55rem;border:0;background:var(--ink);color:var(--shore);font:600 .74rem/1.4 "Archivo",sans-serif;cursor:pointer}
+.note{margin-top:1.3rem;font-size:.85rem;color:var(--soft)}
+.filter{display:none;flex-wrap:wrap;column-gap:1.25rem;row-gap:.35rem;margin-top:1.5rem;font-size:.92rem;font-weight:550}
+.js .filter{display:flex}
+.filter button{padding:.15rem 0;border:0;background:none;color:var(--soft);font:inherit;cursor:pointer}
+.filter button:hover{color:var(--ink)}
+.filter button[aria-pressed="true"]{color:var(--ink);box-shadow:inset 0 -3px 0 var(--pier)}
 
 /* plain labelled rows */
 .plain li + li{margin-top:.9rem}
-.lab{color:var(--soft);font-weight:700;font-variant-numeric:tabular-nums;font-size:.9rem}
+.lab{color:var(--soft);font-weight:600;font-variant-numeric:tabular-nums;font-size:.88rem}
 .plain p{font-size:.97rem;text-wrap:pretty}
 .plain b{font-weight:600}
 
@@ -147,56 +146,55 @@ details.earlier[open] > summary{display:none}
 .theme{display:grid;grid-template-columns:minmax(0,15rem) minmax(0,1fr);column-gap:2.2rem;align-items:start;max-width:60rem}
 .theme + .theme{margin-top:4.2rem}
 .theme figure{margin:.3rem 0 0}
-.theme figcaption{margin-top:.65rem;font-size:.82rem;line-height:1.45;color:var(--soft);text-wrap:pretty}
-.theme h2{font-size:1.3rem;line-height:1.15;margin-bottom:.8rem;text-wrap:balance}
-.theme .text{font-size:1.02rem;line-height:1.6;text-wrap:pretty}
+.theme figcaption{margin-top:.65rem;font-size:.82rem;line-height:1.5;color:var(--soft);text-wrap:pretty}
+.theme h2{font-size:1.3rem;line-height:1.2;margin-bottom:.8rem;text-wrap:balance}
+.theme .text{font-size:1.02rem;line-height:1.65;text-wrap:pretty}
 .qs{list-style:none;margin:1.3rem 0 0;padding:0}
-.qs li{position:relative;padding-left:1.15rem;font-size:.97rem;text-wrap:pretty}
-.qs li::before{position:absolute;left:0;top:.5em;margin:0}
+.qs li{position:relative;padding-left:1.1rem;font-size:.97rem;text-wrap:pretty}
+.qs li::before{position:absolute;left:0;top:.55em;margin:0}
 .qs li + li{margin-top:.55rem}
-.qs a{color:var(--soft);font-size:.84rem;font-weight:600;margin-left:.3rem;white-space:nowrap}
+.qs a{color:var(--soft);font-size:.85rem;font-weight:600;margin-left:.3rem;white-space:nowrap}
 
-/* small pictures of the lake: research figures and code tiles */
+/* small views of the lake: research figures and code tiles */
 .tile{display:block;width:100%;height:auto}
-.tile .w{fill:var(--deep)}
-.tile .r{stroke:var(--glint);stroke-width:2;stroke-linecap:round;fill:none}
-.tile .p{stroke:var(--pier);fill:none}
-.tile .ps{stroke:var(--pier-side);fill:none}
-.tile .f{stroke:var(--foam);fill:none}
-.tile .fs{stroke:var(--foam-soft);fill:none}
-.tile .ff{fill:var(--foam)}
-.tile .fsf{fill:var(--foam-soft)}
+.tile .w{fill:var(--lake)}
+.tile .r{stroke:var(--line);stroke-width:1;fill:none}
+.tile .p{stroke:var(--pier);fill:none;stroke-linejoin:round}
 .tile .pf{fill:var(--pier)}
-.tile .psf{fill:var(--pier-side)}
+.tile .f{stroke:var(--ink);fill:none}
+.tile .fs{stroke:var(--soft);fill:none}
+.tile .ff{fill:var(--shore)}
+.tile .frame{fill:none;stroke:var(--ink);stroke-width:1.2}
+.tile .ball,.tile .m{fill:var(--ink)}
+.tile .n{fill:var(--shore);stroke:var(--ink);stroke-width:1.3}
 .tile .i{fill:var(--isle)}
 .tile .s{fill:var(--shore)}
-.tile .sh{fill:var(--shallow)}
-.tile text{font-family:inherit;font-style:italic;font-size:8.5px;letter-spacing:.26em;fill:var(--foam-soft)}
+.tile .sh{fill:var(--lake-2)}
 
 /* code */
 .codes li{display:grid;grid-template-columns:var(--gutter) minmax(0,1fr);column-gap:var(--gap);align-items:start}
 .codes li + li{margin-top:1.5rem}
 .codes .tile{width:var(--gutter)}
 .codes .t{line-height:1.3}
-.codes .venue{margin-left:.45rem;font-weight:500;color:var(--soft);font-size:.84rem;white-space:nowrap}
+.codes .venue{margin-left:.15rem;font-weight:500;color:var(--soft);font-size:.85rem;white-space:nowrap}
 .codes p.d{margin-top:.25rem;font-size:.95rem;text-wrap:pretty}
 .codes .meta{margin-top:.3rem}
 
-/* footer */
-footer.foot{margin:4.5rem calc(-1 * var(--side)) 0;padding:2.6rem var(--side) 2.8rem;background:var(--night);color:var(--foam-soft);font-size:.85rem}
+/* footer: where the walkway ends */
+footer.foot{margin-top:4.5rem;padding:0 0 2.6rem;color:var(--soft);font-size:.85rem}
 footer.foot p{max-width:40rem;text-wrap:pretty}
-footer.foot p + p{margin-top:.6rem;opacity:.85}
-footer.foot i{color:var(--foam)}
-.jetty{height:12px;width:calc(var(--side) + 5rem);margin:0 0 1.8rem calc(-1 * var(--side));background:var(--pier);box-shadow:3px 3px 0 var(--pier-side)}
+footer.foot p + p{margin-top:.6rem}
+footer.foot i{color:var(--ink)}
+.jetty{height:10px;width:calc(var(--side) + 4.5rem);margin:0 0 1.5rem calc(-1 * var(--side));background:var(--pier)}
 
 /* ---------- small screens: the lake becomes a band at the top ---------- */
 @media (max-width:880px){
   .frame{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
   .lake{position:relative;height:auto;padding:2.6rem 1.25rem 2rem}
   .shore{flex:1 0 auto;min-height:0}
-  .me{position:relative;display:block;left:auto;top:auto;margin:3rem 1.6rem 1.6rem auto;width:6.5rem}
-  .islet,.map{display:none}
-  .links{position:relative!important;left:auto;right:auto;bottom:auto;margin-top:1.4rem}
+  .me{position:relative;display:block;left:auto;top:auto;margin:2.4rem 1.6rem 2rem auto;width:6.5rem}
+  .map{display:none}
+  .links{position:relative!important;left:auto;right:auto;bottom:auto;margin-top:.6rem}
   :root{--side:1.25rem}
   .shore{padding-top:1.4rem}
   .theme{grid-template-columns:minmax(0,1fr);row-gap:1.4rem}
@@ -215,7 +213,6 @@ footer.foot i{color:var(--foam)}
 }
 @media print{
   .lake{position:relative;height:auto;background:none;color:#000}
-  .lake svg,.shore > svg,.me,.islet,.map,.menu,.jetty{display:none}
+  .water,.shore > svg,.me,.map,.menu,.jetty,.filter{display:none}
   .frame{display:block}
-  footer.foot{background:none;color:#000}
 }

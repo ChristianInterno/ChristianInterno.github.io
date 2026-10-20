@@ -15,8 +15,8 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#1A555C" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0E3439" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#E1E9EB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#11262D" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 <script>document.documentElement.classList.add("js");setTimeout(function(){var l=document.getElementById("lake");if(l)l.classList.add("ready")},2500)</script>
@@ -32,16 +32,13 @@
 <div class="frame">
 
 <aside class="lake" id="lake">
-  <svg class="ripples" id="ripples" aria-hidden="true"></svg>
-  <svg class="walk" id="walk-lake" aria-hidden="true"></svg>
+  <svg class="water" id="water" aria-hidden="true"></svg>
   <div class="id">
     <p class="name"><a href="/"><span>Christian</span> <span>Internò</span></a></p>
-    <p class="who" id="who"><b>PhD candidate, Bielefeld University</b>Representation learning, world models, physical reasoning and distributed learning.</p>
+    <p class="who" id="who"><b>PhD candidate, Bielefeld University</b>World models, physical reasoning and distributed learning.</p>
   </div>
-  <img class="isle me" id="me" src="/assets/img/me.jpg" width="200" height="200" alt="Portrait of Christian Internò">
-  <span class="isle islet" id="islet" aria-hidden="true"></span>
-  <p class="map" id="lbl-isle" aria-hidden="true">San Paolo</p>
-  <p class="map" id="lbl-lake" aria-hidden="true">Lago d’Iseo</p>
+  <img class="me" id="me" src="/assets/img/me.jpg" width="200" height="200" alt="Portrait of Christian Internò">
+  <p class="map" id="lbl-lake" aria-hidden="true">Lago d’Iseo, simulated</p>
   <nav class="links" id="links" aria-label="Contact and profiles">
     <a href="mailto:christian.interno@uni-bielefeld.de">Email</a>
     <a href="https://scholar.google.com/citations?user=melu9g0AAAAJ">Scholar</a>
@@ -64,33 +61,33 @@
 
   <section class="col" aria-label="Repositories">
   <ul class="codes">
-    <li><svg class="tile" viewBox="0 0 100 100" aria-hidden="true"><rect class="w" width="100" height="100"/><g class="r"><line x1="14" y1="22" x2="30" y2="22"/><line x1="60" y1="30" x2="76" y2="30"/><line x1="40" y1="84" x2="56" y2="84"/></g><polyline class="ps" stroke-width="8" points="9.8,57.8 93.8,57.8"/><polyline class="p" stroke-width="8" points="8,56 92,56"/><circle class="ff" cx="18" cy="56" r="2.8"/><circle class="ff" cx="39" cy="56" r="2.8"/><circle class="ff" cx="60" cy="56" r="2.8"/><circle class="ff" cx="81" cy="56" r="2.8"/></svg><div>
-      <p class="t">GeoPhys<span class="venue">NeurIPS 2026</span></p>
+    <li><svg class="tile" viewBox="0 0 100 100" aria-hidden="true"><rect class="w" width="100" height="100"/><g class="r"><line x1="0" y1="79" x2="100" y2="79" stroke-dasharray="53 8 32 8 63 5"/><line x1="0" y1="87" x2="100" y2="87" stroke-dasharray="28 3 38 6 61 5 85 5"/><line x1="0" y1="97" x2="100" y2="97" stroke-dasharray="72 8 69 5 60 3"/></g><polyline class="p" stroke-width="6" points="0,71 100,71"/><circle class="frame" cx="10.0" cy="14.0" r="3.4" opacity="0.3"/><circle class="frame" cx="21.6" cy="26.6" r="3.4" opacity="0.36"/><circle class="frame" cx="33.2" cy="64.6" r="3.4" opacity="0.44"/><circle class="frame" cx="44.8" cy="39.3" r="3.4" opacity="0.53"/><circle class="frame" cx="56.4" cy="39.3" r="3.4" opacity="0.64"/><circle class="frame" cx="68.0" cy="64.6" r="3.4" opacity="0.75"/><circle class="frame" cx="79.6" cy="48.8" r="3.4" opacity="0.87"/><circle class="ball" cx="91.2" cy="58.3" r="3.4" opacity="1"/></svg><div>
+      <p class="t">GeoPhys <span class="venue">NeurIPS 2026</span></p>
       <p class="d">Training-free physical plausibility from the trajectory geometry of frozen image encoders.</p>
       <div class="meta"><a href="https://github.com/ChristianInterno/GeoPhys">GitHub</a><a href="/GeoPhys/">project page</a></div>
     </div></li>
-    <li><svg class="tile" viewBox="0 0 100 100" aria-hidden="true"><rect class="w" width="100" height="100"/><rect class="fs" stroke-width="2" x="34" y="18" width="48" height="34"/><rect class="fs" stroke-width="2" x="26" y="30" width="48" height="34"/><rect class="psf" x="21" y="45" width="48" height="34"/><rect class="pf" x="18" y="42" width="48" height="34"/><circle class="w" cx="28" cy="52" r="2"/><circle class="w" cx="28" cy="66" r="2"/><circle class="w" cx="38" cy="52" r="2"/><circle class="w" cx="38" cy="66" r="2"/><circle class="w" cx="48" cy="52" r="2"/><circle class="w" cx="48" cy="66" r="2"/><circle class="w" cx="58" cy="52" r="2"/><circle class="w" cx="58" cy="66" r="2"/></svg><div>
-      <p class="t">GeoPhys features<span class="venue">Hugging Face dataset</span></p>
+    <li><svg class="tile" viewBox="0 0 100 100" aria-hidden="true"><rect class="w" width="100" height="100"/><rect class="fs" stroke-width="1.5" x="34" y="18" width="48" height="34"/><rect class="fs" stroke-width="1.5" x="26" y="30" width="48" height="34"/><rect class="pf" x="18" y="42" width="48" height="34"/><circle class="ff" cx="28" cy="52" r="1.8"/><circle class="ff" cx="28" cy="66" r="1.8"/><circle class="ff" cx="38" cy="52" r="1.8"/><circle class="ff" cx="38" cy="66" r="1.8"/><circle class="ff" cx="48" cy="52" r="1.8"/><circle class="ff" cx="48" cy="66" r="1.8"/><circle class="ff" cx="58" cy="52" r="1.8"/><circle class="ff" cx="58" cy="66" r="1.8"/></svg><div>
+      <p class="t">GeoPhys features <span class="venue">Hugging Face dataset</span></p>
       <p class="d">Precomputed encoder features and the Physics&#8209;IQ candidate videos used in GeoPhys.</p>
       <div class="meta"><a href="https://huggingface.co/datasets/CInterno/GeoPhys-features">Hugging Face</a></div>
     </div></li>
-    <li><svg class="tile" viewBox="0 0 100 100" aria-hidden="true"><rect class="w" width="100" height="100"/><g class="r"><line x1="60" y1="20" x2="78" y2="20"/><line x1="12" y1="84" x2="26" y2="84"/></g><polyline class="ps" stroke-width="7" points="11.6,65.6 29.6,41.6 47.6,69.6 65.6,37.6 91.6,59.6"/><polyline class="p" stroke-width="7" points="10,64 28,40 46,68 64,36 90,58"/></svg><div>
-      <p class="t">ReStraV<span class="venue">NeurIPS 2025</span></p>
+    <li><svg class="tile" viewBox="0 0 100 100" aria-hidden="true"><rect class="w" width="100" height="100"/><g class="r"><line x1="0" y1="78" x2="100" y2="78" stroke-dasharray="53 8 32 8 63 5"/><line x1="0" y1="88" x2="100" y2="88" stroke-dasharray="28 3 38 6 61 5 85 5"/></g><polyline class="p" stroke-width="5" points="10,62 28,40 46,66 64,36 90,56"/></svg><div>
+      <p class="t">ReStraV <span class="venue">NeurIPS 2025</span></p>
       <p class="d">Detecting AI-generated video with perceptual straightening.</p>
       <div class="meta"><a href="https://github.com/ChristianInterno/ReStraV">GitHub</a></div>
     </div></li>
-    <li><svg class="tile" viewBox="0 0 100 100" aria-hidden="true"><rect class="w" width="100" height="100"/><g stroke-width="1.4" stroke-dasharray="2 3" class="fs"><line x1="20" y1="26" x2="50" y2="74"/><line x1="20" y1="74" x2="50" y2="26"/><line x1="50" y1="50" x2="80" y2="62"/><line x1="50" y1="74" x2="80" y2="38"/></g><g stroke-width="3" class="p"><line x1="20" y1="26" x2="50" y2="26"/><line x1="20" y1="50" x2="50" y2="50"/><line x1="20" y1="74" x2="50" y2="74"/><line x1="50" y1="26" x2="80" y2="38"/><line x1="50" y1="50" x2="80" y2="38"/><line x1="50" y1="74" x2="80" y2="62"/></g><circle class="ff" cx="20" cy="26" r="4.2"/><circle class="ff" cx="20" cy="50" r="4.2"/><circle class="ff" cx="20" cy="74" r="4.2"/><circle class="ff" cx="50" cy="26" r="4.2"/><circle class="ff" cx="50" cy="50" r="4.2"/><circle class="ff" cx="50" cy="74" r="4.2"/><circle class="ff" cx="80" cy="38" r="4.2"/><circle class="ff" cx="80" cy="62" r="4.2"/></svg><div>
-      <p class="t">AutoFLIP<span class="venue">IEEE Internet of Things Journal</span></p>
+    <li><svg class="tile" viewBox="0 0 100 100" aria-hidden="true"><rect class="w" width="100" height="100"/><g stroke-width="1.2" stroke-dasharray="2 3" class="fs"><line x1="20" y1="26" x2="50" y2="74"/><line x1="20" y1="74" x2="50" y2="26"/><line x1="50" y1="50" x2="80" y2="62"/><line x1="50" y1="74" x2="80" y2="38"/></g><g stroke-width="2.6" class="p"><line x1="20" y1="26" x2="50" y2="26"/><line x1="20" y1="50" x2="50" y2="50"/><line x1="20" y1="74" x2="50" y2="74"/><line x1="50" y1="26" x2="80" y2="38"/><line x1="50" y1="50" x2="80" y2="38"/><line x1="50" y1="74" x2="80" y2="62"/></g><circle class="n" cx="20" cy="26" r="3.8"/><circle class="n" cx="20" cy="50" r="3.8"/><circle class="n" cx="20" cy="74" r="3.8"/><circle class="n" cx="50" cy="26" r="3.8"/><circle class="n" cx="50" cy="50" r="3.8"/><circle class="n" cx="50" cy="74" r="3.8"/><circle class="n" cx="80" cy="38" r="3.8"/><circle class="n" cx="80" cy="62" r="3.8"/></svg><div>
+      <p class="t">AutoFLIP <span class="venue">IEEE Internet of Things Journal</span></p>
       <p class="d">Automated federated learning via informed pruning.</p>
       <div class="meta"><a href="https://github.com/ChristianInterno/AutoFLIP">GitHub</a></div>
     </div></li>
-    <li><svg class="tile" viewBox="0 0 100 100" aria-hidden="true"><rect class="w" width="100" height="100"/><g class="fs" stroke-width="1.5"><ellipse cx="60" cy="58" rx="36" ry="28"/><ellipse cx="60" cy="58" rx="24" ry="18"/><ellipse cx="60" cy="58" rx="11" ry="8"/></g><polyline class="ps" stroke-width="7" points="9.6,17.6 35.6,17.6 35.6,59.6 61.6,59.6"/><polyline class="p" stroke-width="7" points="8,16 34,16 34,58 60,58"/><circle class="ff" cx="60" cy="58" r="3.4"/></svg><div>
-      <p class="t">FedLEx<span class="venue">IJCNN 2024</span></p>
+    <li><svg class="tile" viewBox="0 0 100 100" aria-hidden="true"><rect class="w" width="100" height="100"/><g class="fs" stroke-width="1.2"><ellipse cx="60" cy="58" rx="36" ry="28"/><ellipse cx="60" cy="58" rx="24" ry="18"/><ellipse cx="60" cy="58" rx="11" ry="8"/></g><polyline class="p" stroke-width="5" points="8,16 34,16 34,58 60,58"/><circle class="ball" cx="60" cy="58" r="3.2"/></svg><div>
+      <p class="t">FedLEx <span class="venue">IJCNN 2024</span></p>
       <p class="d">Federated loss exploration for better convergence on non-IID data.</p>
       <div class="meta"><a href="https://github.com/ChristianInterno/FedLEx">GitHub</a></div>
     </div></li>
-    <li><svg class="tile" viewBox="0 0 100 100" aria-hidden="true"><rect class="w" width="100" height="100"/><polyline class="f" stroke-width="2" stroke-linejoin="round" points="8,42 26,42 26,26 50,26 50,36 60,36 60,22 78,22 78,42 92,42"/><polyline class="ps" stroke-width="6" points="9.3,75.3 27.3,75.3 27.3,63.3 51.3,63.3 51.3,75.3 93.3,75.3"/><polyline class="p" stroke-width="6" points="8,74 26,74 26,62 50,62 50,74 92,74"/><polyline class="fs" stroke-width="2" points="8,90 60,90 60,80 78,80 78,90 92,90"/></svg><div>
-      <p class="t">SIDED<span class="venue">Dataset</span></p>
+    <li><svg class="tile" viewBox="0 0 100 100" aria-hidden="true"><rect class="w" width="100" height="100"/><polyline class="f" stroke-width="1.6" stroke-linejoin="round" points="8,42 26,42 26,26 50,26 50,36 60,36 60,22 78,22 78,42 92,42"/><polyline class="p" stroke-width="5" points="8,72 26,72 26,60 50,60 50,72 92,72"/><polyline class="fs" stroke-width="1.6" points="8,88 60,88 60,80 78,80 78,88 92,88"/></svg><div>
+      <p class="t">SIDED <span class="venue">Dataset</span></p>
       <p class="d">A digital-twin dataset for industrial energy disaggregation.</p>
       <div class="meta"><a href="https://github.com/ChristianInterno/SIDED">GitHub</a></div>
     </div></li>
@@ -99,7 +96,7 @@
   </div>
   <footer class="foot">
     <div class="jetty" aria-hidden="true"></div>
-    <p>I grew up on Lake Iseo. The yellow walkway is for Christo and Jeanne-Claude’s <i>The Floating Piers</i>, which crossed the lake to Monte Isola in the summer of 2016.</p>
+    <p>I grew up on Lake Iseo. The yellow walkway is for Christo and Jeanne-Claude’s <i>The Floating Piers</i>, which crossed the lake to Monte Isola in the summer of 2016. The water beside it runs on the wave equation, the kind of physics a world model has to get right: move across it, or tap it, and the walkway rides the ripples.</p>
     <p>Last updated October 2026.</p>
   </footer>
 </main>

@@ -11,8 +11,8 @@ SITE = {
     "name": "Christian Internò",
     "url": "https://christianinterno.com",
     "title": "PhD candidate, Bielefeld University",
-    "interests": "Representation learning, world models, physical reasoning and distributed learning.",
-    "tagline": "I study how neural networks represent the world, and how they learn together.",
+    "interests": "World models, physical reasoning and distributed learning.",
+    "tagline": "I study how neural networks model the physical world, and how they learn together.",
     "email": "christian.interno@uni-bielefeld.de",
     "links": [
         ("Email", "mailto:christian.interno@uni-bielefeld.de"),
@@ -31,9 +31,10 @@ SITE = {
 BIO = [
     'I’m a PhD candidate at Bielefeld University with <a href="https://hammer-lab.techfak.uni-bielefeld.de/">Barbara Hammer</a>, '
     'working with the <a href="https://www.honda-ri.de/">Honda Research Institute Europe</a>, and a Visiting Fellow in Philip Torr’s '
-    '<a href="https://torrvision.com/">Torr Vision Group</a> at the University of Oxford. My main line of work reads the geometry of '
-    'learned representations: how networks encode physical structure, and how we can measure it. The other is distributed learning: '
-    'many models learning together without sharing their data.',
+    '<a href="https://torrvision.com/">Torr Vision Group</a> at the University of Oxford. Most of my work is on world models and '
+    'physical reasoning: I read the geometry of learned representations to find out what networks know about physics, and use it '
+    'to tell whether a generated video could really happen. I also work on distributed learning, where many models learn together '
+    'without sharing their data.',
     'Before that I was a visiting researcher at <a href="https://www.cshl.edu/">Cold Spring Harbor Laboratory</a> and Leiden University, '
     'and I studied data science at the University of Milano-Bicocca. Off the clock, you’ll find me surfing, at the cinema or at a concert.',
 ]
@@ -56,8 +57,11 @@ NEWS = [
     {"date": "Dec 2024", "text": "Oral at the NeurIPS 2024 International Workshop on Federated Foundation Models."},
 ]
 
+# The two lines of work. Papers, research themes and the publications filter use these keys.
+LINES = {"rep": "World models and physical reasoning", "dist": "Distributed learning"}
+
 # kind: "pub" (published or accepted) or "pre" (preprint)
-# line: "rep" (representations and world models), "dist" (distributed learning) or "other"
+# line: "rep" (world models and physical reasoning), "dist" (distributed learning) or "other"
 # bib: "conf" (booktitle), "journal" or "arxiv"
 PAPERS = [
     {
@@ -173,10 +177,10 @@ RESEARCH_INTRO = (
 
 THEMES = [
     {
-        "id": "representations",
-        "title": "Representations, world models and physical reasoning",
-        "figure": "straight",
-        "caption": "A natural video walks a nearly straight path through a good representation. A generated one tends to stumble.",
+        "id": "representations", "line": "rep",
+        "title": "World models and physical reasoning",
+        "figure": "bounce",
+        "caption": "A ball bouncing on the walkway, one dot per frame. Real physics leaves a regular trace like this; GeoPhys looks for it in the path a video takes through a frozen image encoder.",
         "text": "Neural networks see the world through their representations. I ask what those representations encode about physics, "
                 "and how to read it out without changing the model in the process.",
         "questions": [
@@ -190,7 +194,7 @@ THEMES = [
         "papers": ["interno2026geophys", "interno2025restrav", "kutluozen2026linear", "interno2026observer"],
     },
     {
-        "id": "distributed",
+        "id": "distributed", "line": "dist",
         "title": "Distributed learning",
         "figure": "islands",
         "caption": "Many islands, one walkway: the models travel, the data stays home.",
@@ -213,16 +217,16 @@ TALKS = [
     {"date": "Dec 2025", "title": "AI-Generated Video Detection via Perceptual Straightening", "kind": "Poster",
      "where": "NeurIPS 2025, San Diego"},
     {"date": "Dec 2024", "title": "Adaptive hybrid model pruning in federated learning", "kind": "Oral",
-     "where": "International Workshop on Federated Foundation Models, NeurIPS 2024, Vancouver"},
+     "where": "the International Workshop on Federated Foundation Models, NeurIPS 2024, Vancouver"},
     {"date": "2024", "title": "European Graduate Network Symposium", "kind": "Talk",
-     "where": "Honda Research Institute"},
+     "where": "the Honda Research Institute"},
     {"date": "Earlier", "title": "Machine learning for signal disaggregation", "kind": "Seminar",
-     "where": "University of Milano-Bicocca"},
+     "where": "the University of Milano-Bicocca"},
 ]
 
-# glyph: straight, kinked, prune, landscape, signal, frames
+# glyph: bounce, straight, kinked, prune, landscape, signal, frames
 CODE = [
-    {"name": "GeoPhys", "venue": "NeurIPS 2026", "glyph": "straight",
+    {"name": "GeoPhys", "venue": "NeurIPS 2026", "glyph": "bounce",
      "text": "Training-free physical plausibility from the trajectory geometry of frozen image encoders.",
      "links": [("GitHub", "https://github.com/ChristianInterno/GeoPhys"), ("project page", "/GeoPhys/")]},
     {"name": "GeoPhys features", "venue": "Hugging Face dataset", "glyph": "frames",
@@ -260,4 +264,5 @@ VOLUNTEERING = [
 ]
 
 FOOTNOTE = ("I grew up on Lake Iseo. The yellow walkway is for Christo and Jeanne-Claude’s <i>The Floating Piers</i>, "
-            "which crossed the lake to Monte Isola in the summer of 2016.")
+            "which crossed the lake to Monte Isola in the summer of 2016. The water beside it runs on the wave equation, "
+            "the kind of physics a world model has to get right: move across it, or tap it, and the walkway rides the ripples.")

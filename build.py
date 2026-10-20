@@ -122,16 +122,26 @@ def bibtex(p):
 
 
 # ---------------------------------------------------------------- pictures
-# Little views of the lake, drawn in the site's colours so they follow light and dark mode.
+# Small views of the lake in the site's colours, so they follow light and dark mode.
 
 def _pier(points, w):
-    shifted = " ".join(f"{float(x) + w / 4.5:.1f},{float(y) + w / 4.5:.1f}" for x, y in (p.split(",") for p in points.split()))
-    return (f'<polyline class="ps" stroke-width="{w}" points="{shifted}"/>'
-            f'<polyline class="p" stroke-width="{w}" points="{points}"/>')
+    return f'<polyline class="p" stroke-width="{w}" points="{points}"/>'
 
 
-def _ripples(lines):
-    return '<g class="r">' + "".join(f'<line x1="{a}" y1="{b}" x2="{c}" y2="{b}"/>' for a, b, c in lines) + "</g>"
+def _water(ys, x0, x1):
+    # still water: long strokes broken by short gaps, a different rhythm on every line
+    out = []
+    for n, y in enumerate(ys):
+        s, dash, total = n * 7919 + 101, [], 0
+        while total < (x1 - x0) + 60:
+            s = (s * 16807) % 2147483647
+            on = 18 + (s % 1000) / 1000 * 70
+            s = (s * 16807) % 2147483647
+            off = 3 + (s % 1000) / 1000 * 7
+            dash += [f"{on:.0f}", f"{off:.0f}"]
+            total += on + off
+        out.append(f'<line x1="{x0}" y1="{y}" x2="{x1}" y2="{y}" stroke-dasharray="{" ".join(dash)}"/>')
+    return '<g class="r">' + "".join(out) + "</g>"
 
 
 def _island(x, y, r):
@@ -139,52 +149,69 @@ def _island(x, y, r):
             f'<circle class="i" cx="{x}" cy="{y}" r="{r}"/>')
 
 
-def figure_straight():
-    dots = "".join(f'<circle class="ff" cx="{x}" cy="62" r="3.4"/>' for x in (26, 64, 102, 140, 178, 216))
-    gen = [(26, 128), (64, 106), (102, 142), (140, 112), (178, 152), (216, 118)]
-    gpts = " ".join(f"{x},{y}" for x, y in gen)
-    gdots = "".join(f'<circle class="fsf" cx="{x}" cy="{y}" r="3"/>' for x, y in gen)
-    return ('<svg class="tile" viewBox="0 0 240 180" role="img" aria-label="A straight walkway and a zig-zag line">'
+def _bounce(x0, top, ground, r, n0, e, frames, every, vx):
+    """A ball dropped from rest at height `top`, bouncing on `ground` with restitution `e`.
+    Sampled every `every` frames; with n0 = 8 and e = 0.75 the contacts fall exactly on frames 8 and 20."""
+    contact = ground - r
+    g = 2 * (contact - top) / n0 ** 2                 # so that the fall takes n0 frames
+    starts, v, t = [(0.0, 0.0, True)], e * g * n0, float(n0)
+    while t <= frames:
+        starts.append((t, v, False))
+        t += 2 * v / g
+        v *= e
+    out, shown = [], list(range(0, frames + 1, every))
+    for idx, f in enumerate(shown):
+        t0, v0, drop = [s for s in starts if s[0] <= f][-1]
+        tau = f - t0
+        y = top + 0.5 * g * f * f if drop else contact - v0 * tau + 0.5 * g * tau * tau
+        last = idx == len(shown) - 1
+        op = 1 if last else round(0.3 + 0.7 * (idx / (len(shown) - 1)) ** 1.3, 2)
+        out.append(f'<circle class="{"ball" if last else "frame"}" cx="{x0 + vx * f:.1f}" cy="{y:.1f}" r="{r}" opacity="{op}"/>')
+    return "".join(out)
+
+
+def figure_bounce():
+    return ('<svg class="tile" viewBox="0 0 240 180" role="img" aria-label="A ball bouncing along the walkway, drawn once per frame">'
             '<rect class="w" width="240" height="180"/>'
-            + _ripples([(150, 22, 172), (196, 36, 210), (18, 94, 34), (190, 88, 222), (92, 170, 116), (30, 160, 42)])
-            + _pier("20,62 222,62", 9) + dots
-            + f'<polyline class="fs" stroke-width="2" stroke-linejoin="round" points="{gpts}"/>' + gdots
-            + '<text x="20" y="40">natural</text><text x="20" y="174">generated</text></svg>')
+            + _water((122, 131, 142, 155, 171), 0, 240)
+            + _pier("0,112 240,112", 7)
+            + _bounce(18, 22, 108.5, 5.2, 8, 0.75, 28, 2, 7.6) + "</svg>")
 
 
 def figure_islands():
     arms = ["46,32 120,32 120,90", "206,56 206,90 120,90", "192,152 120,152 120,90", "34,130 34,90 120,90"]
-    piers = "".join(_pier(a, 7) for a in arms)
+    piers = "".join(_pier(a, 6) for a in arms)
     clients = "".join(_island(x, y, 7) for x, y in ((46, 32), (206, 56), (192, 152), (34, 130)))
     return ('<svg class="tile" viewBox="0 0 240 180" role="img" aria-label="Four small islands joined to a central one by walkways">'
             '<rect class="w" width="240" height="180"/>'
-            + _ripples([(150, 20, 170), (64, 64, 84), (160, 122, 182), (20, 170, 36), (214, 110, 230), (80, 116, 96)])
+            + _water((18, 46, 74, 104, 136, 168), 0, 240)
             + piers + clients + _island(120, 90, 12)
-            + '<rect class="ff" x="78" y="28" width="8" height="8"/><rect class="ff" x="156" y="148" width="8" height="8"/></svg>')
+            + '<rect class="m" x="78" y="28" width="8" height="8"/><rect class="m" x="156" y="148" width="8" height="8"/></svg>')
 
 
 GLYPHS = {
-    "straight": _ripples([(14, 22, 30), (60, 30, 76), (40, 84, 56)]) + _pier("8,56 92,56", 8)
-                + "".join(f'<circle class="ff" cx="{x}" cy="56" r="2.8"/>' for x in (18, 39, 60, 81)),
-    "frames": '<rect class="fs" stroke-width="2" x="34" y="18" width="48" height="34"/>'
-              '<rect class="fs" stroke-width="2" x="26" y="30" width="48" height="34"/>'
-              '<rect class="psf" x="21" y="45" width="48" height="34"/><rect class="pf" x="18" y="42" width="48" height="34"/>'
-              + "".join(f'<circle class="w" cx="{x}" cy="{y}" r="2"/>' for x in (28, 38, 48, 58) for y in (52, 66)),
-    "kinked": _ripples([(60, 20, 78), (12, 84, 26)]) + _pier("10,64 28,40 46,68 64,36 90,58", 7),
-    "prune": '<g stroke-width="1.4" stroke-dasharray="2 3" class="fs">'
+    "bounce": _water((79, 87, 97), 0, 100) + _pier("0,71 100,71", 6) + _bounce(10, 14, 68, 3.4, 8, 0.75, 28, 4, 2.9),
+    "straight": _water((66, 76, 88), 0, 100) + _pier("8,56 92,56", 6)
+                + "".join(f'<circle class="ff" cx="{x}" cy="56" r="2.2"/>' for x in (18, 39, 60, 81)),
+    "frames": '<rect class="fs" stroke-width="1.5" x="34" y="18" width="48" height="34"/>'
+              '<rect class="fs" stroke-width="1.5" x="26" y="30" width="48" height="34"/>'
+              '<rect class="pf" x="18" y="42" width="48" height="34"/>'
+              + "".join(f'<circle class="ff" cx="{x}" cy="{y}" r="1.8"/>' for x in (28, 38, 48, 58) for y in (52, 66)),
+    "kinked": _water((78, 88), 0, 100) + _pier("10,62 28,40 46,66 64,36 90,56", 5),
+    "prune": '<g stroke-width="1.2" stroke-dasharray="2 3" class="fs">'
              '<line x1="20" y1="26" x2="50" y2="74"/><line x1="20" y1="74" x2="50" y2="26"/>'
              '<line x1="50" y1="50" x2="80" y2="62"/><line x1="50" y1="74" x2="80" y2="38"/></g>'
-             '<g stroke-width="3" class="p"><line x1="20" y1="26" x2="50" y2="26"/><line x1="20" y1="50" x2="50" y2="50"/>'
+             '<g stroke-width="2.6" class="p"><line x1="20" y1="26" x2="50" y2="26"/><line x1="20" y1="50" x2="50" y2="50"/>'
              '<line x1="20" y1="74" x2="50" y2="74"/><line x1="50" y1="26" x2="80" y2="38"/><line x1="50" y1="50" x2="80" y2="38"/>'
              '<line x1="50" y1="74" x2="80" y2="62"/></g>'
-             + "".join(f'<circle class="ff" cx="{x}" cy="{y}" r="4.2"/>'
+             + "".join(f'<circle class="n" cx="{x}" cy="{y}" r="3.8"/>'
                        for x, y in ((20, 26), (20, 50), (20, 74), (50, 26), (50, 50), (50, 74), (80, 38), (80, 62))),
-    "landscape": '<g class="fs" stroke-width="1.5"><ellipse cx="60" cy="58" rx="36" ry="28"/>'
+    "landscape": '<g class="fs" stroke-width="1.2"><ellipse cx="60" cy="58" rx="36" ry="28"/>'
                  '<ellipse cx="60" cy="58" rx="24" ry="18"/><ellipse cx="60" cy="58" rx="11" ry="8"/></g>'
-                 + _pier("8,16 34,16 34,58 60,58", 7) + '<circle class="ff" cx="60" cy="58" r="3.4"/>',
-    "signal": '<polyline class="f" stroke-width="2" stroke-linejoin="round" points="8,42 26,42 26,26 50,26 50,36 60,36 60,22 78,22 78,42 92,42"/>'
-              + _pier("8,74 26,74 26,62 50,62 50,74 92,74", 6)
-              + '<polyline class="fs" stroke-width="2" points="8,90 60,90 60,80 78,80 78,90 92,90"/>',
+                 + _pier("8,16 34,16 34,58 60,58", 5) + '<circle class="ball" cx="60" cy="58" r="3.2"/>',
+    "signal": '<polyline class="f" stroke-width="1.6" stroke-linejoin="round" points="8,42 26,42 26,26 50,26 50,36 60,36 60,22 78,22 78,42 92,42"/>'
+              + _pier("8,72 26,72 26,60 50,60 50,72 92,72", 5)
+              + '<polyline class="fs" stroke-width="1.6" points="8,88 60,88 60,80 78,80 78,88 92,88"/>',
 }
 
 
@@ -193,7 +220,7 @@ def glyph(name):
             f'{GLYPHS[name]}</svg>')
 
 
-FIGURES = {"straight": figure_straight, "islands": figure_islands}
+FIGURES = {"bounce": figure_bounce, "islands": figure_islands}
 
 
 # ---------------------------------------------------------------- shared pieces
@@ -218,8 +245,8 @@ def head(path, title, desc, noindex=False, extra=""):
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#1A555C" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0E3439" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#E1E9EB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#11262D" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 <script>document.documentElement.classList.add("js");setTimeout(function(){{var l=document.getElementById("lake");if(l)l.classList.add("ready")}},2500)</script>
@@ -239,16 +266,13 @@ def lake(is_home):
     name = f'<h1 class="name">{name}</h1>' if is_home else f'<p class="name"><a href="/">{name}</a></p>'
     links = "\n    ".join(f'<a href="{u}">{l}</a>' for l, u in C.SITE["links"])
     return f"""<aside class="lake" id="lake">
-  <svg class="ripples" id="ripples" aria-hidden="true"></svg>
-  <svg class="walk" id="walk-lake" aria-hidden="true"></svg>
+  <svg class="water" id="water" aria-hidden="true"></svg>
   <div class="id">
     {name}
     <p class="who" id="who"><b>{C.SITE["title"]}</b>{C.SITE["interests"]}</p>
   </div>
-  <img class="isle me" id="me" src="/assets/img/me.jpg" width="200" height="200" alt="Portrait of {esc(ME)}">
-  <span class="isle islet" id="islet" aria-hidden="true"></span>
-  <p class="map" id="lbl-isle" aria-hidden="true">San Paolo</p>
-  <p class="map" id="lbl-lake" aria-hidden="true">Lago d’Iseo</p>
+  <img class="me" id="me" src="/assets/img/me.jpg" width="200" height="200" alt="Portrait of {esc(ME)}">
+  <p class="map" id="lbl-lake" aria-hidden="true">Lago d’Iseo, simulated</p>
   <nav class="links" id="links" aria-label="Contact and profiles">
     {links}
   </nav>
@@ -306,7 +330,7 @@ def paper(p, bib=False):
     meta += [f'<a href="{u}">{l}</a>' for l, u in p["links"]]
     if bib:
         meta.append(f'<button class="bibtoggle" type="button" aria-expanded="false" aria-controls="bib-{p["key"]}">BibTeX</button>')
-    out = [f'    <li class="row" id="{p["key"]}"><span class="{badge}">{p["badge"]}</span><div>',
+    out = [f'    <li class="row" id="{p["key"]}" data-line="{p["line"]}"><span class="{badge}">{p["badge"]}</span><div>',
            f'      <p class="t">{p["title"]}</p>',
            f'      <p class="au">{authors}</p>']
     if meta:
@@ -336,6 +360,8 @@ def home():
     if earlier:
         news += '\n  <details class="earlier"><summary>Earlier news</summary>\n  ' + feed(earlier) + "\n  </details>"
     sel = [p for p in C.PAPERS if p.get("selected")]
+    groups = "\n  ".join(f'<h3 class="group">{label}</h3>\n  ' + papers([p for p in sel if p["line"] == line])
+                         for line, label in C.LINES.items() if any(p["line"] == line for p in sel))
     return f"""  <section class="bio col" aria-label="About">
     <p class="lead">{C.SITE["tagline"]}</p>
     {bio}
@@ -348,7 +374,7 @@ def home():
 
   <section class="col" aria-labelledby="sel-h">
   <h2 id="sel-h">Selected publications</h2>
-  {papers(sel)}
+  {groups}
   <p class="more"><a href="/publications/">All publications and preprints</a></p>
   </section>"""
 
@@ -366,6 +392,7 @@ def research():
       <ul class="qs">
 {qs}
       </ul>
+      <p class="more"><a href="/publications/?line={t["line"]}">All papers on {C.LINES[t["line"]][0].lower() + C.LINES[t["line"]][1:]}</a></p>
     </div>
   </section>""")
     return f"""  <div class="pagehead">
@@ -379,10 +406,14 @@ def research():
 def publications():
     pubs = [p for p in C.PAPERS if p["kind"] == "pub"]
     pre = [p for p in C.PAPERS if p["kind"] == "pre"]
+    filters = "".join(f'<button type="button" data-line="{k}" aria-pressed="false">{v}</button>' for k, v in C.LINES.items())
     return f"""  <div class="pagehead">
     <h1 class="title" id="anchor">Publications</h1>
     <p>Newest first. * marks equal contribution. Citations are on <a href="{SCHOLAR}">Google Scholar</a>
     and the record is on <a href="{C.SITE["dblp"]}">dblp</a>.</p>
+    <div class="filter" role="group" aria-label="Show papers on">
+      <button type="button" data-line="" aria-pressed="true">All</button>{filters}
+    </div>
   </div>
 
   <section class="col" aria-labelledby="pub-h">
@@ -406,7 +437,7 @@ def talks():
     for t in C.TALKS:
         d = "date next" if t.get("next") else "date"
         rows.append(f'    <li class="row"><span class="{d}">{t["date"]}</span><div><p class="t">{t["title"]}</p>'
-                    f'<p class="where">{t["kind"]} · {t["where"]}</p></div></li>')
+                    f'<p class="where">{t["kind"]} at {t["where"]}</p></div></li>')
     return f"""  <div class="pagehead tight">
     <h1 class="title" id="anchor">Talks</h1>
   </div>
@@ -423,7 +454,7 @@ def code():
     for c in C.CODE:
         links = "".join(f'<a href="{u}">{l}</a>' for l, u in c["links"])
         rows.append(f"""    <li>{glyph(c["glyph"])}<div>
-      <p class="t">{c["name"]}<span class="venue">{c["venue"]}</span></p>
+      <p class="t">{c["name"]} <span class="venue">{c["venue"]}</span></p>
       <p class="d">{c["text"]}</p>
       <div class="meta">{links}</div>
     </div></li>""")
