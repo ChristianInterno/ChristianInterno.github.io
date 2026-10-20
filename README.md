@@ -54,7 +54,7 @@ and shows up at christianinterno.com/GeoPhys/ by itself.
 
 - **CV**: save a PDF as `assets/cv.pdf` and rebuild; a "CV" item appears in the menu.
 - **Photo**: `assets/img/me.jpg` is 200×200. A square photo of 600×600 or more, under the same name, looks sharper.
-- **Colours**: `--lake` is the water, `--pier` the walkway, `--shore` the page, `--ink` the text. Dark mode has its own set just below.
+- **Colours**: black and white, with the walkway as the only colour: `--paper`, `--ink`, `--graphite` (the pencil lines) and `--pier` (the orange). Dark mode swaps paper and ink, like chalk on a blackboard. The name and the caption under the lake are set in Caveat, to read like handwriting on the drawing.
 - **The walkway** finds the "Recently" heading on the About page and runs through the dates; on Talks it runs
   through the talk dates. One section per page can carry `data-rail`; its `class="date"` labels become the landings.
 - **The water** is simulated with the 2D wave equation. Moving the pointer over it, or tapping it, makes ripples

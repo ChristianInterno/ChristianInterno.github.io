@@ -10,6 +10,7 @@ CNAME and .nojekyll next to this file. Needs nothing beyond Python 3.
 import datetime
 import html
 import json
+import math
 import os
 import re
 import sys
@@ -122,31 +123,98 @@ def bibtex(p):
 
 
 # ---------------------------------------------------------------- pictures
-# Small views of the lake in the site's colours, so they follow light and dark mode.
+# Small pencil drawings in the site's colours (they follow light and dark mode); the walkway is
+# coloured in orange, the way Christo coloured the piers into his drawings.
 
-def _pier(points, w):
-    return f'<polyline class="p" stroke-width="{w}" points="{points}"/>'
+def _rng(seed):
+    s = (seed * 7919 + 13) % 2147483647 or 1
+
+    def r():
+        nonlocal s
+        s = (s * 16807) % 2147483647
+        return (s - 1) / 2147483646
+    return r
 
 
-def _water(ys, x0, x1):
-    # still water: long strokes broken by short gaps, a different rhythm on every line
+def _hand(seed, amp=1.0):
+    """A hand is never ruler-straight: a slow, seeded wobble."""
+    r = _rng(seed)
+    p0, p1, p2 = r() * 6.283, r() * 6.283, r() * 6.283
+    return lambda x: amp * (0.55 * math.sin(x / 61 + p0) + 0.32 * math.sin(x / 27 + p1) + 0.16 * math.sin(x / 11.5 + p2))
+
+
+def _pts(seq):
+    return " ".join(f"{x:.1f},{y:.1f}" for x, y in seq)
+
+
+def _dense(points, step=5):
+    out = []
+    for (x0, y0), (x1, y1) in zip(points, points[1:]):
+        m = max(1, math.ceil((abs(x1 - x0) + abs(y1 - y0)) / step))
+        out += [(x0 + (x1 - x0) * t / m, y0 + (y1 - y0) * t / m) for t in range(m)]
+    return out + [points[-1]]
+
+
+def _wobble(d, h, off=0.0):
+    out = []
+    for i, (x, y) in enumerate(d):
+        j = i + 1 if i < len(d) - 1 else i - 1
+        steep = abs(d[j][1] - y) > abs(d[j][0] - x)
+        w = h(x + y)
+        out.append((x + off + (w if steep else 0), y + off + (0 if steep else w)))
+    return out
+
+
+def _pencil(points, cls, seed, amp=0.6, ghost=True, extra=""):
+    """A line drawn by hand, then gone over a second time, lighter."""
+    d = _dense(points)
+    out = f'<polyline class="{cls}"{extra} points="{_pts(_wobble(d, _hand(seed, amp)))}"/>'
+    if ghost:
+        out += f'<polyline class="{cls}"{extra} opacity=".4" points="{_pts(_wobble(d, _hand(seed + 1, amp * 1.3), 0.7))}"/>'
+    return out
+
+
+def _pier(points, w, seed=1):
+    """The walkway, coloured in: three strokes side by side, each with its own wobble."""
+    d, out = _dense(points), []
+    for k, (o, ww, op) in enumerate(((-0.3, 0.42, .9), (0.0, 0.46, 1), (0.3, 0.42, .85))):
+        line = _wobble(d, _hand(seed * 10 + k, 0.45), o * w)
+        out.append(f'<polyline class="p" stroke-width="{ww * w:.1f}" opacity="{op}" points="{_pts(line)}"/>')
+    return "".join(out)
+
+
+def _water(ys, x0, x1, seed=3):
+    # still water: pencil strokes broken by short lifts, a different rhythm on every line
     out = []
     for n, y in enumerate(ys):
-        s, dash, total = n * 7919 + 101, [], 0
+        r, dash, total = _rng(seed * 31 + n), [], 0
         while total < (x1 - x0) + 60:
-            s = (s * 16807) % 2147483647
-            on = 18 + (s % 1000) / 1000 * 70
-            s = (s * 16807) % 2147483647
-            off = 3 + (s % 1000) / 1000 * 7
+            on, off = 18 + r() * 70, 3 + r() * 7
             dash += [f"{on:.0f}", f"{off:.0f}"]
             total += on + off
-        out.append(f'<line x1="{x0}" y1="{y}" x2="{x1}" y2="{y}" stroke-dasharray="{" ".join(dash)}"/>')
-    return '<g class="r">' + "".join(out) + "</g>"
+        end = x1 - r() * (x1 - x0) * 0.12
+        out.append(_pencil([(x0, y), (end, y)], "r", seed * 50 + n, 0.5, ghost=False, extra=f' stroke-dasharray="{" ".join(dash)}"'))
+    return "<g>" + "".join(out) + "</g>"
 
 
-def _island(x, y, r):
-    return (f'<circle class="sh" cx="{x}" cy="{y}" r="{r * 2}"/><circle class="s" cx="{x}" cy="{y}" r="{r * 1.3:.1f}"/>'
-            f'<circle class="i" cx="{x}" cy="{y}" r="{r}"/>')
+def _loop(cx, cy, r, seed, cls="i"):
+    """A circle in one movement of the pencil: it never quite closes on itself."""
+    h, a = _hand(seed, 0.9), []
+    t = 0.0
+    while t <= 6.283 * 1.06:
+        rr = r + h(t * 40) * 0.6 + t * 0.12
+        a.append((cx + rr * math.cos(t - 1.9), cy + rr * math.sin(t - 1.9)))
+        t += 0.12
+    return f'<polyline class="{cls}" points="{_pts(a)}"/>'
+
+
+def _island(x, y, r, seed=1):
+    return f'<circle class="s" cx="{x}" cy="{y}" r="{r * 1.9:.1f}"/>' + _loop(x, y, r, seed)
+
+
+def _frame(w, h, seed):
+    """The edge of the little sheet, drawn freehand."""
+    return _pencil([(1.4, 2.0), (w - 1.6, 1.2), (w - 1.0, h - 1.8), (1.8, h - 1.2), (1.2, 2.6)], "edge", seed, 0.35, ghost=False)
 
 
 def _bounce(x0, top, ground, r, n0, e, frames, every, vx):
@@ -173,51 +241,62 @@ def _bounce(x0, top, ground, r, n0, e, frames, every, vx):
 def figure_bounce():
     return ('<svg class="tile" viewBox="0 0 240 180" role="img" aria-label="A ball bouncing along the walkway, drawn once per frame">'
             '<rect class="w" width="240" height="180"/>'
-            + _water((122, 131, 142, 155, 171), 0, 240)
-            + _pier("0,112 240,112", 7)
-            + _bounce(18, 22, 108.5, 5.2, 8, 0.75, 28, 2, 7.6) + "</svg>")
+            + _water((124, 133, 144, 157, 172), 6, 234)
+            + _pier([(3, 112), (237, 112)], 7, 4)
+            + _bounce(18, 22, 108.5, 5.2, 8, 0.75, 28, 2, 7.6) + _frame(240, 180, 5) + "</svg>")
 
 
 def figure_islands():
-    arms = ["46,32 120,32 120,90", "206,56 206,90 120,90", "192,152 120,152 120,90", "34,130 34,90 120,90"]
-    piers = "".join(_pier(a, 6) for a in arms)
-    clients = "".join(_island(x, y, 7) for x, y in ((46, 32), (206, 56), (192, 152), (34, 130)))
+    arms = [[(46, 32), (120, 32), (120, 90)], [(206, 56), (206, 90), (120, 90)],
+            [(192, 152), (120, 152), (120, 90)], [(34, 130), (34, 90), (120, 90)]]
+    piers = "".join(_pier(a, 6, 10 + k) for k, a in enumerate(arms))
+    clients = "".join(_island(x, y, 8, 20 + k) for k, (x, y) in enumerate(((46, 32), (206, 56), (192, 152), (34, 130))))
     return ('<svg class="tile" viewBox="0 0 240 180" role="img" aria-label="Four small islands joined to a central one by walkways">'
             '<rect class="w" width="240" height="180"/>'
-            + _water((18, 46, 74, 104, 136, 168), 0, 240)
-            + piers + clients + _island(120, 90, 12)
-            + '<rect class="m" x="78" y="28" width="8" height="8"/><rect class="m" x="156" y="148" width="8" height="8"/></svg>')
+            + _water((20, 48, 76, 106, 138, 168), 6, 234, 7)
+            + piers + clients + _island(120, 90, 13, 30)
+            + '<rect class="m" x="78" y="28" width="8" height="8" transform="rotate(-4 82 32)"/>'
+            + '<rect class="m" x="156" y="148" width="8" height="8" transform="rotate(5 160 152)"/>'
+            + _frame(240, 180, 6) + "</svg>")
+
+
+def _ellipse(cx, cy, rx, ry, seed):
+    h, a, t = _hand(seed, 0.8), [], 0.0
+    while t <= 6.283 * 1.04:
+        k = 1 + h(t * 30) * 0.03
+        a.append((cx + rx * k * math.cos(t), cy + ry * k * math.sin(t)))
+        t += 0.15
+    return f'<polyline class="fs" stroke-width="1.1" points="{_pts(a)}"/>'
 
 
 GLYPHS = {
-    "bounce": _water((79, 87, 97), 0, 100) + _pier("0,71 100,71", 6) + _bounce(10, 14, 68, 3.4, 8, 0.75, 28, 4, 2.9),
-    "straight": _water((66, 76, 88), 0, 100) + _pier("8,56 92,56", 6)
-                + "".join(f'<circle class="ff" cx="{x}" cy="56" r="2.2"/>' for x in (18, 39, 60, 81)),
-    "frames": '<rect class="fs" stroke-width="1.5" x="34" y="18" width="48" height="34"/>'
-              '<rect class="fs" stroke-width="1.5" x="26" y="30" width="48" height="34"/>'
-              '<rect class="pf" x="18" y="42" width="48" height="34"/>'
-              + "".join(f'<circle class="ff" cx="{x}" cy="{y}" r="1.8"/>' for x in (28, 38, 48, 58) for y in (52, 66)),
-    "kinked": _water((78, 88), 0, 100) + _pier("10,62 28,40 46,66 64,36 90,56", 5),
-    "prune": '<g stroke-width="1.2" stroke-dasharray="2 3" class="fs">'
+    "bounce": _water((80, 88, 96), 6, 94, 11) + _pier([(3, 71), (97, 71)], 6, 12) + _bounce(10, 14, 68, 3.4, 8, 0.75, 28, 4, 2.9),
+    "straight": _water((66, 76, 88), 6, 94, 13) + _pier([(8, 56), (92, 56)], 6, 14)
+                + "".join(f'<circle class="ff" cx="{x}" cy="56" r="1.9"/>' for x in (18, 39, 60, 81)),
+    "frames": _pencil([(34, 18), (82, 18), (82, 52), (34, 52), (34, 18)], "f", 15, 0.35, extra=' stroke-width="1.2"')
+              + _pencil([(26, 30), (74, 30), (74, 64), (26, 64), (26, 30)], "f", 17, 0.35, extra=' stroke-width="1.2"')
+              + '<polygon class="pf" points="18.6,42.8 42,41.6 66.4,42.4 65.6,59 66.8,76.2 42,75.4 17.6,76.6 18.4,60"/>'
+              + "".join(f'<circle class="ff" cx="{x}" cy="{y}" r="1.7"/>' for x in (28, 38, 48, 58) for y in (52, 66)),
+    "kinked": _water((80, 90), 6, 94, 19) + _pier([(10, 62), (28, 40), (46, 66), (64, 36), (90, 56)], 5, 20),
+    "prune": '<g stroke-width="1.1" stroke-dasharray="2 3" class="fs">'
              '<line x1="20" y1="26" x2="50" y2="74"/><line x1="20" y1="74" x2="50" y2="26"/>'
              '<line x1="50" y1="50" x2="80" y2="62"/><line x1="50" y1="74" x2="80" y2="38"/></g>'
-             '<g stroke-width="2.6" class="p"><line x1="20" y1="26" x2="50" y2="26"/><line x1="20" y1="50" x2="50" y2="50"/>'
-             '<line x1="20" y1="74" x2="50" y2="74"/><line x1="50" y1="26" x2="80" y2="38"/><line x1="50" y1="50" x2="80" y2="38"/>'
-             '<line x1="50" y1="74" x2="80" y2="62"/></g>'
+             + "".join(_pier([a, b], 3.2, 30 + k) for k, (a, b) in enumerate((((20, 26), (50, 26)), ((20, 50), (50, 50)), ((20, 74), (50, 74)),
+                                                                             ((50, 26), (80, 38)), ((50, 50), (80, 38)), ((50, 74), (80, 62)))))
              + "".join(f'<circle class="n" cx="{x}" cy="{y}" r="3.8"/>'
                        for x, y in ((20, 26), (20, 50), (20, 74), (50, 26), (50, 50), (50, 74), (80, 38), (80, 62))),
-    "landscape": '<g class="fs" stroke-width="1.2"><ellipse cx="60" cy="58" rx="36" ry="28"/>'
-                 '<ellipse cx="60" cy="58" rx="24" ry="18"/><ellipse cx="60" cy="58" rx="11" ry="8"/></g>'
-                 + _pier("8,16 34,16 34,58 60,58", 5) + '<circle class="ball" cx="60" cy="58" r="3.2"/>',
-    "signal": '<polyline class="f" stroke-width="1.6" stroke-linejoin="round" points="8,42 26,42 26,26 50,26 50,36 60,36 60,22 78,22 78,42 92,42"/>'
-              + _pier("8,72 26,72 26,60 50,60 50,72 92,72", 5)
-              + '<polyline class="fs" stroke-width="1.6" points="8,88 60,88 60,80 78,80 78,88 92,88"/>',
+    "landscape": _ellipse(60, 58, 36, 28, 41) + _ellipse(60, 58, 24, 18, 42) + _ellipse(60, 58, 11, 8, 43)
+                 + _pier([(8, 16), (34, 16), (34, 58), (60, 58)], 5, 44) + '<circle class="ball" cx="60" cy="58" r="3.2"/>',
+    "signal": _pencil([(8, 42), (26, 42), (26, 26), (50, 26), (50, 36), (60, 36), (60, 22), (78, 22), (78, 42), (92, 42)], "f", 51, 0.4,
+                      extra=' stroke-width="1.5"')
+              + _pier([(8, 72), (26, 72), (26, 60), (50, 60), (50, 72), (92, 72)], 5, 52)
+              + _pencil([(8, 88), (60, 88), (60, 80), (78, 80), (78, 88), (92, 88)], "fs", 53, 0.4, ghost=False, extra=' stroke-width="1.4"'),
 }
 
 
 def glyph(name):
     return (f'<svg class="tile" viewBox="0 0 100 100" aria-hidden="true"><rect class="w" width="100" height="100"/>'
-            f'{GLYPHS[name]}</svg>')
+            f'{GLYPHS[name]}{_frame(100, 100, 60 + sum(map(ord, name)))}</svg>')
 
 
 FIGURES = {"bounce": figure_bounce, "islands": figure_islands}
@@ -245,14 +324,14 @@ def head(path, title, desc, noindex=False, extra=""):
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="theme-color" content="#E1E9EB" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#11262D" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 <script>document.documentElement.classList.add("js");setTimeout(function(){{var l=document.getElementById("lake");if(l)l.classList.add("ready")}},2500)</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,400..800;1,62..125,400..800&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,400..800;1,62..125,400..800&amp;family=Caveat:wght@400;600&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/site.css">
 <script src="/assets/js/lake.js" defer></script>
 <noscript><style>.bibbox[hidden]{{display:block}}</style></noscript>
